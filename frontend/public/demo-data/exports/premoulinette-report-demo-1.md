@@ -1,6 +1,6 @@
 # PréMoulinette report — TP 1 — MysteryInc: First Launch
 
-Analysis #1 · 2026-10-04 09:51 UTC · 1.9 s · sandbox: local
+Analysis #1 · 2026-10-04 12:48 UTC · 1.6 s · sandbox: local
 
 > **DO NOT SUBMIT YET** — 31 mandatory failure(s) remain. Fix critical issues first.
 

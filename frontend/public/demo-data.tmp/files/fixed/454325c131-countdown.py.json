@@ -1,1 +1,0 @@
-{"path":"MysteryInc/FirstLaunch/bonus/countdown.py","content":"def main() -> None:\n    number = int(input(\"Countdown start: \"))\n    # range() is not authorized: count down with a while loop\n    while number >= 1:\n        print(number)\n        number = number - 1\n    print(\"Liftoff!\")\n\n\nif __name__ == \"__main__\":\n    main()\n","language":"python","size":262}

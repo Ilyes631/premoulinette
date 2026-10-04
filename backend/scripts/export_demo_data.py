@@ -300,16 +300,14 @@ class Exporter:
         buggy_view = self.api.get(f"/api/projects/{BUGGY_PROJECT}")
         self.capture_files(BUGGY_PROJECT, None, "buggy", buggy_view)
 
-        # The student fixes the code: same project, its folder now holds the fixed version.
-        rec = self.store.get_project(BUGGY_PROJECT)
-        fixed_source = (DEMO_DIR / "projects" / "mysteryinc_fixed").resolve()
-        self.store.save_project(rec.model_copy(update={"source_path": str(fixed_source)}))
+        # Re-analyze: the SAME unchanged code again. Same code => same result (68%), as in the real app;
+        # switching to the fixed code here made visitors believe the tool gives random scores.
         self.analyze(BUGGY_PROJECT, RUN_2)
-        fixed_view = self.api.get(f"/api/projects/{BUGGY_PROJECT}")
-        self.capture_files(BUGGY_PROJECT, RUN_2, "fixed", fixed_view)
+        again_view = self.api.get(f"/api/projects/{BUGGY_PROJECT}")
+        self.capture_files(BUGGY_PROJECT, RUN_2, "buggy", again_view)
         out.route(request_key("GET", f"/api/projects/{BUGGY_PROJECT}"), [
             {"after": None, "file": out.write_json(f"projects/{BUGGY_PROJECT}.json", buggy_view)},
-            {"after": RUN_2, "file": out.write_json(f"projects/{BUGGY_PROJECT}.after-{RUN_2}.json", fixed_view)},
+            {"after": RUN_2, "file": out.write_json(f"projects/{BUGGY_PROJECT}.after-{RUN_2}.json", again_view)},
         ])
 
         # "Load fixed demo" + Analyze.

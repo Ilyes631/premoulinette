@@ -1,1 +1,0 @@
-{"path":"MysteryInc/FirstLaunch/bonus/max_altitude.py","content":"def max_altitude(a: int, b: int, c: int) -> int:\n    return max(a, b, c)\n","language":"python","size":73}

@@ -83,7 +83,7 @@ export function ResultsHeader({ report, onReanalyze, reanalyzing }: ResultsHeade
           </Tooltip>
         </div>
         {IS_DEMO && report.score.verdict !== 'ready' && (
-          <p className="text-2xs text-fg-subtle">Demo: Re-analyze runs the project after the student's fixes.</p>
+          <p className="text-2xs text-fg-subtle">Example project, not your work. Same code, same result: use “Load fixed demo” to see a passing project.</p>
         )}
       </div>
     </header>

@@ -1,1 +1,0 @@
-{"path":"MysteryInc/FirstLaunch/flight_functions/kelvin.py","content":"def to_kelvin(celsius: float) -> float:\n    # 0 degrees Celsius is 273.15 Kelvin\n    return celsius + 273.15\n","language":"python","size":109}

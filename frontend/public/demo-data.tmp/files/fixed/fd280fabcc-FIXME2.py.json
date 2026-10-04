@@ -1,1 +1,0 @@
-{"path":"MysteryInc/FirstLaunch/FIXME2.py","content":"def average_speed(distance: float, hours: float) -> float:\n    # Shaggy forgot that we cannot divide by zero hours\n    if hours == 0:\n        return 0.0\n    return distance / hours\n","language":"python","size":181}

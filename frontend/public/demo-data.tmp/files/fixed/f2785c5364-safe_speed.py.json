@@ -1,1 +1,0 @@
-{"path":"MysteryInc/FirstLaunch/flight_functions/safe_speed.py","content":"def is_safe(speed: int, limit: int) -> bool:\n    # We are safe as long as we do not go over the limit\n    if speed <= limit:\n        return True\n    else:\n        return False\n","language":"python","size":176}

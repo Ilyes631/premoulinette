@@ -1,1 +1,0 @@
-{"ok":true,"version":"0.1.0","python":"3.14.7","docker":{"available":false,"version":null,"image":"python:3.12-slim","image_ready":false,"error":null},"sandbox_mode":"local","sandbox_mode_effective":"local","sandbox_note":"Developer mode (local sandbox) selected in Settings.","ai":{"configured":false,"enabled":false},"demo":true}

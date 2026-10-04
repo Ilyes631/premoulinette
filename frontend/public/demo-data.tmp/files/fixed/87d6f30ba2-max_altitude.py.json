@@ -1,1 +1,0 @@
-{"path":"MysteryInc/FirstLaunch/bonus/max_altitude.py","content":"def max_altitude(a: int, b: int, c: int) -> int:\n    # max() is forbidden, so compare by hand\n    highest = a\n    if b > highest:\n        highest = b\n    if c > highest:\n        highest = c\n    return highest\n","language":"python","size":209}
