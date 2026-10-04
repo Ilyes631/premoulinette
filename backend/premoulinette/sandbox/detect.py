@@ -1,11 +1,13 @@
 """Docker availability detection (cached) and image download."""
 from __future__ import annotations
 
+import os
 import shutil
 import subprocess
 import threading
 import time
 from collections.abc import Callable
+from pathlib import Path
 
 from pydantic import BaseModel
 
@@ -14,6 +16,31 @@ from premoulinette.sandbox.procutil import no_window_flags
 DEFAULT_IMAGE = "python:3.12-slim"
 CACHE_TTL_S = 30.0
 PULL_TIMEOUT_S = 900.0
+
+# Default Docker Desktop CLI locations: a server started BEFORE Docker was installed keeps its old PATH.
+DOCKER_FALLBACK_PATHS: list[Path] = [
+    Path(os.environ.get("ProgramFiles", r"C:\Program Files")) / "Docker" / "Docker" / "resources" / "bin" / "docker.exe",
+    Path("/usr/local/bin/docker"),
+    Path("/opt/homebrew/bin/docker"),
+]
+
+
+def find_docker() -> str | None:
+    """The docker CLI: on PATH, else a default Docker Desktop install location.
+
+    When found outside PATH, its directory is appended to this process's PATH so that docker's
+    helpers living next to it (e.g. ``docker-credential-desktop`` used by ``docker pull``) resolve too.
+    """
+    found = shutil.which("docker")
+    if found:
+        return found
+    for candidate in DOCKER_FALLBACK_PATHS:
+        if candidate.is_file():
+            bin_dir = str(candidate.parent)
+            if bin_dir not in os.environ.get("PATH", "").split(os.pathsep):
+                os.environ["PATH"] = os.environ.get("PATH", "") + os.pathsep + bin_dir
+            return str(candidate)
+    return None
 
 
 class DockerStatus(BaseModel):
@@ -70,7 +97,7 @@ def detect_docker(image: str = DEFAULT_IMAGE, timeout: float = 4.0, *, use_cache
             hit = _cache.get(image)
             if hit is not None and now - hit[0] < CACHE_TTL_S:
                 return hit[1].model_copy()
-    docker = shutil.which("docker")
+    docker = find_docker()
     if docker is None:
         status = DockerStatus(available=False, image=image, error="Docker is not installed (docker command not found)")
     else:
@@ -87,7 +114,7 @@ def clear_cache() -> None:
 
 def pull_image(image: str, *, timeout: float = PULL_TIMEOUT_S, run: Runner | None = None) -> tuple[bool, str]:
     """``docker pull <image>``. Returns (ok, human-readable message)."""
-    docker = shutil.which("docker")
+    docker = find_docker()
     if docker is None:
         return False, "Docker is not installed (docker command not found)"
     try:

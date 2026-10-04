@@ -114,10 +114,22 @@ def _fresh_cache():
 
 def test_detect_without_docker_is_fast(monkeypatch):
     monkeypatch.setattr(detect.shutil, "which", lambda name: None)
+    monkeypatch.setattr(detect, "DOCKER_FALLBACK_PATHS", [])
     status = detect.detect_docker("python:3.12-slim")
     assert status.available is False and status.image_ready is False
     assert status.error and "not installed" in status.error
     assert detect.pull_image("python:3.12-slim")[0] is False
+
+
+def test_find_docker_falls_back_to_default_install_location(monkeypatch, tmp_path):
+    fake = tmp_path / "Docker" / "resources" / "bin" / "docker.exe"
+    fake.parent.mkdir(parents=True)
+    fake.write_bytes(b"")
+    monkeypatch.setattr(detect.shutil, "which", lambda name: None)
+    monkeypatch.setattr(detect, "DOCKER_FALLBACK_PATHS", [tmp_path / "missing.exe", fake])
+    monkeypatch.setenv("PATH", "C:\\nothing")
+    assert detect.find_docker() == str(fake)
+    assert str(fake.parent) in detect.os.environ["PATH"].split(detect.os.pathsep)   # helpers next to it resolve
 
 
 def test_detect_with_fake_docker_and_cache(monkeypatch):

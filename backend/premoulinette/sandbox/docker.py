@@ -23,6 +23,7 @@ from premoulinette.results.models import SandboxInfo
 from premoulinette.runner.models import RunPlan, RunResults
 from premoulinette.sandbox import common
 from premoulinette.sandbox.base import copy_harness, copy_project, make_world_readable, write_plan
+from premoulinette.sandbox.detect import find_docker
 from premoulinette.sandbox.procutil import collect, kill_tree, no_window_flags
 
 DEFAULT_IMAGE = "python:3.12-slim"
@@ -124,7 +125,7 @@ class DockerSandbox:
             validate_image(self.image)
         except ValueError as exc:
             return common.failed_results(plan, "docker", str(exc))
-        docker = self.docker or shutil.which("docker")
+        docker = self.docker or find_docker()
         if docker is None:
             return common.failed_results(plan, "docker", "Docker is not installed (docker command not found)")
         tmp = Path(tempfile.mkdtemp(prefix="pm-docker-"))
