@@ -1,0 +1,42 @@
+# Read-only online demo of PréMoulinette on Netlify: the static SPA only, no backend.
+# The answers of the demo are the JSON files of frontend/public/demo-data, generated from the real
+# API by backend/scripts/export_demo_data.py and committed (Netlify does not run Python).
+
+[build]
+  base = "frontend"
+  command = "npm ci && npm run build:demo"
+  publish = "dist"
+
+[build.environment]
+  NODE_VERSION = "24"
+
+# A missing demo file is a real 404 (not the SPA shell served with 200).
+[[redirects]]
+  from = "/demo-data/*"
+  to = "/404.html"
+  status = 404
+
+# Single-page app: every route (/analyses/<id>/issues, /history...) is served by index.html.
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
+
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Content-Type-Options = "nosniff"
+    Referrer-Policy = "strict-origin-when-cross-origin"
+    X-Frame-Options = "DENY"
+
+# Hashed bundles never change.
+[[headers]]
+  for = "/assets/*"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
+
+# The demo data changes when it is re-exported: short cache.
+[[headers]]
+  for = "/demo-data/*"
+  [headers.values]
+    Cache-Control = "public, max-age=300, must-revalidate"

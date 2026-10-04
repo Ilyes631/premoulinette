@@ -5,7 +5,11 @@
  *   when the SPA is served by `python -m premoulinette`).
  * - Mutating requests always carry `X-PreMoulinette: 1` (the backend's CSRF guard).
  * - Non-2xx responses become an {@link ApiError} carrying the JSON `detail`.
+ * - In the online demo build (VITE_DEMO=1) the same functions are served by the static transport
+ *   of `./demo` instead of `fetch` (one code path for every caller).
  */
+import { ApiError, formatErrorDetail } from './api-error'
+import { demoTransport, IS_DEMO } from './demo'
 import type {
   AnalysisComparison,
   AnalysisListItem,
@@ -30,72 +34,17 @@ import type {
   SubjectDocumentView,
   SubjectTests,
   SubjectView,
-  ValidationErrorItem,
 } from './types'
 import { folderNameOf, relativePathOf } from './uploads'
+
+export { ApiError, errorMessage, formatErrorDetail, isApiError } from './api-error'
+export { DemoReadOnlyError, isDemoReadOnlyError } from './demo'
 
 export const API_BASE = '/api'
 export const CSRF_HEADER = 'X-PreMoulinette'
 
 const OFFLINE_MESSAGE =
   'Cannot reach the PréMoulinette server. Start it with "python -m premoulinette" and retry.'
-
-export class ApiError extends Error {
-  readonly status: number
-  readonly detail: unknown
-
-  constructor(status: number, message: string, detail: unknown = null) {
-    super(message)
-    this.name = 'ApiError'
-    this.status = status
-    this.detail = detail
-  }
-
-  /** True when the server could not be reached at all. */
-  get isNetworkError(): boolean {
-    return this.status === 0
-  }
-
-  /** FastAPI 422 items (`[{loc, msg}]`), empty for any other error. */
-  get validationErrors(): ValidationErrorItem[] {
-    return Array.isArray(this.detail) ? this.detail.filter(isValidationItem) : []
-  }
-}
-
-function isValidationItem(value: unknown): value is ValidationErrorItem {
-  return typeof value === 'object' && value !== null && 'msg' in value && 'loc' in value
-}
-
-/** Human-readable message out of a FastAPI `detail` payload (string, list of items or object). */
-export function formatErrorDetail(detail: unknown): string | null {
-  if (typeof detail === 'string') return detail.trim() || null
-  if (Array.isArray(detail)) {
-    const parts = detail.map((item) => {
-      if (isValidationItem(item)) {
-        const loc = item.loc.filter((p) => p !== 'body').join('.')
-        return loc ? `${loc}: ${item.msg}` : item.msg
-      }
-      return typeof item === 'string' ? item : JSON.stringify(item)
-    })
-    return parts.length ? parts.join('; ') : null
-  }
-  if (detail && typeof detail === 'object') {
-    const obj = detail as Record<string, unknown>
-    if (typeof obj.message === 'string') return obj.message
-    if (typeof obj.detail === 'string') return obj.detail
-  }
-  return null
-}
-
-export function isApiError(error: unknown): error is ApiError {
-  return error instanceof ApiError
-}
-
-/** Best message for any thrown value (used by toasts and error cards). */
-export function errorMessage(error: unknown): string {
-  if (error instanceof ApiError || error instanceof Error) return error.message
-  return typeof error === 'string' ? error : 'Unexpected error'
-}
 
 // ---------------------------------------------------------------------------------------------
 // Core request helper
@@ -146,6 +95,10 @@ async function toApiError(res: Response): Promise<ApiError> {
 
 export async function apiRequest<T>(path: string, options: RequestOptions = {}): Promise<T> {
   const method = options.method ?? 'GET'
+  if (IS_DEMO) {
+    const { json, form, query, signal } = options
+    return demoTransport().request<T>({ method, path, json, form, query, signal })
+  }
   const headers = new Headers({ Accept: 'application/json' })
   if (method !== 'GET') headers.set(CSRF_HEADER, '1')
 
@@ -251,9 +204,9 @@ export const listAnalyses = (params: ListAnalysesParams = {}) =>
 export const getAnalysis = (id: string) => apiRequest<AnalysisReport>(`/analyses/${enc(id)}`)
 export const compareAnalyses = (id: string, baseId: string) =>
   apiRequest<AnalysisComparison>(`/analyses/${enc(id)}/compare/${enc(baseId)}`)
-/** Plain link for `<a href download>` (GET, no custom header needed). */
+/** Plain link for `<a href download>` (GET, no custom header needed; a static file in the demo). */
 export const exportUrl = (id: string, format: ExportFormat) =>
-  buildUrl(`/analyses/${enc(id)}/export`, { format })
+  IS_DEMO ? demoTransport().exportUrl(id, format) : buildUrl(`/analyses/${enc(id)}/export`, { format })
 
 // Check ids contain ':', '/' and '#': always encode them (the backend route accepts encoded slashes).
 export const explainCheck = (analysisId: string, checkId: string, req: ExplainRequest) =>

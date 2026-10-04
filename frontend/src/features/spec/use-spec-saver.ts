@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { isApiError } from '@/lib/api'
+import { toastDemoReadOnly } from '@/lib/demo/notify'
 import { useUpdateSpec } from '@/lib/queries'
 import { toast } from '@/lib/toast'
 import type { PracticalSpec } from '@/lib/types'
@@ -32,6 +33,7 @@ export function useSpecSaver(subjectId: string): SpecSaver {
       })
       return true
     } catch (error) {
+      if (toastDemoReadOnly(error)) return false
       if (isApiError(error) && error.status === 422) {
         const items = formatValidationItems(error.validationErrors)
         setErrors(items.length ? items : [{ path: 'spec', message: error.message }])

@@ -1,0 +1,1 @@
+{"path":"MysteryInc/FirstLaunch/route_math/mission_clock.py","content":"def mission_clock(seconds: int) -> str:\n    hours = seconds // 3600\n    minutes = seconds % 3600 // 60\n    secs = seconds % 60\n    # :02 pads each field with a leading zero\n    return f\"{hours:02}:{minutes:02}:{secs:02}\"\n","language":"python","size":221}

@@ -3,6 +3,7 @@ import { Box, CircleCheck, CircleX, Download, ShieldAlert, ShieldCheck } from 'l
 import { useEffect, useId, useRef, useState } from 'react'
 import { Badge, Button, Input, ProgressBar, Skeleton } from '@/components/ui'
 import { errorMessage } from '@/lib/api'
+import { toastDemoReadOnly } from '@/lib/demo/notify'
 import { cn } from '@/lib/cn'
 import { queryKeys, useHealth, useJob, usePrepareSandbox } from '@/lib/queries'
 import { toast } from '@/lib/toast'
@@ -156,6 +157,7 @@ function DockerStatusPanel() {
       const { job_id } = await prepare.mutateAsync()
       setJobId(job_id)
     } catch (error) {
+      if (toastDemoReadOnly(error)) return
       toast({ title: 'The image could not be prepared', description: errorMessage(error), tone: 'error' })
     }
   }

@@ -1,5 +1,6 @@
 import { Languages, RotateCcw, RotateCw, Save, Settings2 } from 'lucide-react'
 import { useId, useState } from 'react'
+import { DemoReadOnlyNotice } from '@/components/demo/read-only-notice'
 import { Button, EmptyState, Input, Skeleton } from '@/components/ui'
 import { AiSection } from '@/features/settings/ai-section'
 import { FieldError, RadioCards, SettingsSection } from '@/features/settings/parts'
@@ -13,6 +14,8 @@ import {
   type SettingsDraft,
 } from '@/features/settings/settings-form'
 import { errorMessage, isApiError } from '@/lib/api'
+import { IS_DEMO } from '@/lib/demo/config'
+import { toastDemoReadOnly } from '@/lib/demo/notify'
 import { useSettings, useUpdateSettings } from '@/lib/queries'
 import { toast } from '@/lib/toast'
 import type { ExplanationLanguage, Settings } from '@/lib/types'
@@ -25,6 +28,7 @@ export function SettingsPage() {
         <h1 className="text-2xl font-semibold tracking-tight text-fg">Settings</h1>
         <p className="mt-1 text-sm text-fg-muted">Everything stays on this machine. Saved in the local PréMoulinette data folder.</p>
       </div>
+      {IS_DEMO && <DemoReadOnlyNotice action="Saving settings" />}
       {query.isPending ? (
         <div className="space-y-4" aria-busy aria-label="Loading the settings">
           <Skeleton className="h-72" />
@@ -81,6 +85,7 @@ function SettingsForm({ saved }: { saved: Settings }) {
       setServerErrors({})
       toast({ title: successTitle, tone: 'success' })
     } catch (error) {
+      if (toastDemoReadOnly(error)) return
       if (isApiError(error) && error.validationErrors.length) {
         const fieldErrors: FieldErrors = {}
         for (const item of error.validationErrors) {

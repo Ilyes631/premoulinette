@@ -1,8 +1,9 @@
 import { ArrowRight, CircleAlert, CircleCheck, FileText, RefreshCw, ScrollText, TriangleAlert } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
+import { DemoReadOnlyNotice } from '@/components/demo/read-only-notice'
 import { Badge, Button, DropZone, ProgressBar, Skeleton, Spinner, Tooltip } from '@/components/ui'
-import { errorMessage, isApiError } from '@/lib/api'
+import { errorMessage, isApiError, isDemoReadOnlyError } from '@/lib/api'
 import { cn } from '@/lib/cn'
 import { useSubject, useUploadSubject } from '@/lib/queries'
 import type { SubjectMediaType, SubjectView } from '@/lib/types'
@@ -54,9 +55,11 @@ export function SubjectCard({ subjectId, onSelect, externalBusy = false, onState
   const uploading = upload.isPending || externalBusy
   const data = subject.data && subject.data.id === subjectId ? subject.data : undefined
   const loading = Boolean(subjectId) && subject.isPending
+  // The online demo refuses uploads: explained by a notice, not reported as a failure.
+  const demoRefusal = !localError && isDemoReadOnlyError(upload.error) ? upload.error : null
   const state: ImportState = uploading
     ? 'uploading'
-    : upload.isError || localError || (subject.isError && !data)
+    : (upload.isError && !demoRefusal) || localError || (subject.isError && !data)
       ? 'error'
       : data
         ? 'ready'
@@ -103,8 +106,10 @@ export function SubjectCard({ subjectId, onSelect, externalBusy = false, onState
         />
       )}
 
-      {errorText && !uploading && (
-        <ImportError title="The subject could not be imported" message={errorText} />
+      {demoRefusal && !uploading ? (
+        <DemoReadOnlyNotice action={demoRefusal.action} className="mt-3" />
+      ) : (
+        errorText && !uploading && <ImportError title="The subject could not be imported" message={errorText} />
       )}
       {subject.isError && !data && !uploading && !(isApiError(subject.error) && subject.error.status === 404) && (
         <ImportError title="The selected subject could not be loaded" message={errorMessage(subject.error)}>

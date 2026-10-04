@@ -1,4 +1,4 @@
-import { CircleCheck, CircleX, Info, TriangleAlert, X } from 'lucide-react'
+import { ArrowUpRight, CircleCheck, CircleX, Info, TriangleAlert, X } from 'lucide-react'
 import { AnimatePresence, motion, useReducedMotion } from 'motion/react'
 import { cn } from '@/lib/cn'
 import { dismissToast, useToasts, type ToastTone } from '@/lib/toast'
@@ -38,6 +38,16 @@ export function Toaster() {
               <div className="min-w-0 flex-1">
                 <p className="text-sm font-medium text-fg">{t.title}</p>
                 {t.description && <p className="mt-0.5 text-xs break-words text-fg-muted">{t.description}</p>}
+                {t.action && (
+                  <a
+                    href={t.action.href}
+                    {...(/^https?:/.test(t.action.href) ? { target: '_blank', rel: 'noreferrer' } : {})}
+                    className="mt-1.5 inline-flex items-center gap-1 text-xs font-medium text-accent-fg underline-offset-4 hover:underline"
+                  >
+                    {t.action.label}
+                    <ArrowUpRight className="size-3" aria-hidden />
+                  </a>
+                )}
               </div>
               <button
                 type="button"

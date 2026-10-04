@@ -15,6 +15,7 @@ import { StructureTab } from '@/features/spec/structure-tab'
 import { TestsTab } from '@/features/spec/tests-tab'
 import { useSpecSaver } from '@/features/spec/use-spec-saver'
 import { errorMessage, isApiError } from '@/lib/api'
+import { toastDemoReadOnly } from '@/lib/demo/notify'
 import { useHealth, useReparseSubject, useSettings, useStartAnalysis, useSubject, useUpdateSettings } from '@/lib/queries'
 import { toast } from '@/lib/toast'
 import type { ExerciseSpec, PracticalSpec, SubjectView } from '@/lib/types'
@@ -150,6 +151,7 @@ function SpecReview({ subject }: { subject: SubjectView }) {
       setAiOpen(false)
       toast({ title: 'Subject re-parsed with AI', description: 'Review the AI-extracted items before analyzing.', tone: 'success' })
     } catch (error) {
+      if (toastDemoReadOnly(error)) return setAiOpen(false)
       toast({ title: 'AI re-parse failed', description: errorMessage(error), tone: 'error' })
     }
   }

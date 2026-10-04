@@ -14,6 +14,7 @@ import {
   languageFromPath,
 } from '@/components/ui'
 import { errorMessage } from '@/lib/api'
+import { IS_DEMO } from '@/lib/demo/config'
 import { useProjectFile } from '@/lib/queries'
 import type { FileTarget } from './results-context'
 import { vscodeUrl } from './selectors'
@@ -30,7 +31,8 @@ interface CodeViewerDialogProps {
 export function CodeViewerDialog({ projectId, projectPath, target, onClose }: CodeViewerDialogProps) {
   const file = useProjectFile(projectId, target?.file)
   const line = target?.line ?? null
-  const vscode = target ? vscodeUrl(projectPath, target.file, line) : null
+  // The online demo has no local folder to open.
+  const vscode = target && !IS_DEMO ? vscodeUrl(projectPath, target.file, line) : null
 
   return (
     <Dialog open={target !== null} onOpenChange={(open) => !open && onClose()}>

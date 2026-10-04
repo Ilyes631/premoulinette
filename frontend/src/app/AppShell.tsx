@@ -2,8 +2,10 @@ import { History, ScanSearch, Settings, type LucideIcon } from 'lucide-react'
 import { MotionConfig } from 'motion/react'
 import { useEffect } from 'react'
 import { Link, NavLink, Outlet, useLocation } from 'react-router-dom'
+import { DemoBanner } from '@/components/demo/demo-banner'
 import { ThemeToggle } from '@/components/ui'
 import { cn } from '@/lib/cn'
+import { IS_DEMO } from '@/lib/demo/config'
 import { LogoMark } from './logo'
 import { SandboxPill } from './sandbox-pill'
 
@@ -55,6 +57,8 @@ export function AppShell() {
           <div className="bg-dots absolute inset-0 opacity-50 [mask-image:radial-gradient(48rem_26rem_at_50%_0%,black,transparent_75%)]" />
         </div>
 
+        {IS_DEMO && <DemoBanner />}
+
         <header className="sticky top-0 z-40 border-b border-border bg-bg/75 backdrop-blur-xl backdrop-saturate-150">
           <div className="mx-auto flex h-14 w-full max-w-6xl items-center gap-2 px-4 sm:gap-4 sm:px-6">
             <Link
@@ -92,7 +96,8 @@ export function AppShell() {
         <footer className="border-t border-border">
           <div className="mx-auto flex w-full max-w-6xl flex-col items-center justify-between gap-1 px-4 py-5 text-center text-xs text-fg-subtle sm:flex-row sm:px-6 sm:text-left">
             <p>
-              Readiness Score is not an official grade <span aria-hidden>·</span> Everything runs locally
+              Readiness Score is not an official grade <span aria-hidden>·</span>{' '}
+              {IS_DEMO ? 'Online demo: nothing is uploaded, no code runs' : 'Everything runs locally'}
             </p>
             <p className="hidden sm:block">PréMoulinette</p>
           </div>

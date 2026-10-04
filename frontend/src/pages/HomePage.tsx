@@ -14,6 +14,9 @@ import { SubjectCard } from '@/features/home/subject-card'
 import { rememberJob } from '@/features/progress/job-context'
 import { errorMessage } from '@/lib/api'
 import { describeSandbox } from '@/app/sandbox-status'
+import { DemoSteps } from '@/features/home/demo-steps'
+import { cn } from '@/lib/cn'
+import { IS_DEMO } from '@/lib/demo/config'
 import { useHealth, useLoadDemo, useProject, useStartAnalysis, useSubject } from '@/lib/queries'
 import { toast } from '@/lib/toast'
 import type { DemoVariant } from '@/lib/types'
@@ -111,6 +114,7 @@ export function HomePage() {
   }, [])
 
   const demoBusy = demo.isPending
+  const demoLoaded = Boolean(subject.data && project.data)
 
   return (
     <div className="flex flex-col gap-10 sm:gap-12">
@@ -138,7 +142,14 @@ export function HomePage() {
             </p>
           </div>
           <div className="flex flex-wrap items-center gap-3">
-            <Button variant="secondary" onClick={() => loadDemo('buggy')} loading={demoBusy && demo.variables === 'buggy'} disabled={demoBusy}>
+            <Button
+              variant={IS_DEMO ? 'primary' : 'secondary'}
+              size={IS_DEMO ? 'lg' : 'md'}
+              onClick={() => loadDemo('buggy')}
+              loading={demoBusy && demo.variables === 'buggy'}
+              disabled={demoBusy}
+              className={cn(IS_DEMO && !demoLoaded && 'ring-4 ring-accent/20')}
+            >
               {!(demoBusy && demo.variables === 'buggy') && <Sparkles aria-hidden />}
               Load demo project
             </Button>
@@ -147,6 +158,8 @@ export function HomePage() {
             </Button>
           </div>
         </div>
+
+        {IS_DEMO && <DemoSteps loaded={demoLoaded} />}
 
         <ul className="grid gap-3 sm:grid-cols-3">
           {VALUE_PROPS.map(({ icon: Icon, title, text }) => (

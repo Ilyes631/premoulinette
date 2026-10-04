@@ -30,6 +30,8 @@ export interface Health {
   /** Why that mode was chosen (or why nothing can run). */
   sandbox_note?: string | null
   ai: { configured: boolean; enabled: boolean }
+  /** Set by the read-only online demo data (never by the real server). */
+  demo?: boolean
 }
 
 // ---- settings ------------------------------------------------------------------------------

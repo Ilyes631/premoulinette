@@ -11,8 +11,9 @@ import {
   X,
 } from 'lucide-react'
 import { useEffect, useId, useState, type FormEvent } from 'react'
+import { DemoReadOnlyNotice } from '@/components/demo/read-only-notice'
 import { Badge, Button, Input, Skeleton, Tabs, TabsContent, TabsList, TabsTrigger, Tooltip } from '@/components/ui'
-import { errorMessage, isApiError } from '@/lib/api'
+import { errorMessage, isApiError, isDemoReadOnlyError } from '@/lib/api'
 import { useCreateProject, useProject, type ProjectSource } from '@/lib/queries'
 import type { ProjectSourceKindView, ProjectView } from '@/lib/types'
 import { isZipFile, prepareFolderFiles, ZIP_ACCEPT } from '@/lib/uploads'
@@ -92,10 +93,12 @@ export function ProjectCard({ projectId, onSelect, externalBusy = false, onState
   const loading = Boolean(projectId) && project.isPending
   const showSummary = Boolean(data) && !replacing && !uploading
   const errorText = localError ?? (create.isError ? errorMessage(create.error) : null)
+  // The online demo refuses imports: explained by a notice, not reported as a failure.
+  const demoRefusal = !localError && isDemoReadOnlyError(create.error) ? create.error : null
 
   const state: ImportState = uploading
     ? 'uploading'
-    : errorText || (project.isError && !data)
+    : (errorText && !demoRefusal) || (project.isError && !data)
       ? 'error'
       : data
         ? 'ready'
@@ -193,7 +196,11 @@ export function ProjectCard({ projectId, onSelect, externalBusy = false, onState
       )}
 
       {note && showSummary && <p className="mt-3 text-xs text-fg-subtle">{note}</p>}
-      {errorText && !uploading && <ImportError title="The project could not be imported" message={errorText} />}
+      {demoRefusal && !uploading ? (
+        <DemoReadOnlyNotice action={demoRefusal.action} className="mt-3" />
+      ) : (
+        errorText && !uploading && <ImportError title="The project could not be imported" message={errorText} />
+      )}
       {project.isError && !data && !uploading && !(isApiError(project.error) && project.error.status === 404) && (
         <ImportError title="The selected project could not be loaded" message={errorMessage(project.error)}>
           <Button size="sm" variant="secondary" onClick={() => void project.refetch()}>

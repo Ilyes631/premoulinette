@@ -203,7 +203,11 @@ export function useStartAnalysis() {
   const qc = useQueryClient()
   return useMutation({
     mutationFn: (req: StartAnalysisRequest) => api.startAnalysis(req),
-    onSuccess: () => void qc.invalidateQueries({ queryKey: ['analyses', 'list'] }),
+    onSuccess: (_job, req) => {
+      void qc.invalidateQueries({ queryKey: ['analyses', 'list'] })
+      // The run re-snapshots path/demo projects: files viewed before must be read again.
+      void qc.invalidateQueries({ queryKey: queryKeys.project(req.project_id) })
+    },
   })
 }
 

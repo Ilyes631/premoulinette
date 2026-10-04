@@ -1,9 +1,9 @@
 import type { Health } from '@/lib/types'
 
-export type SandboxTone = 'pass' | 'warning' | 'fail' | 'neutral'
+export type SandboxTone = 'pass' | 'warning' | 'fail' | 'neutral' | 'accent'
 
 export interface SandboxStatus {
-  kind: 'docker' | 'local' | 'none' | 'offline' | 'loading'
+  kind: 'docker' | 'local' | 'none' | 'offline' | 'loading' | 'demo'
   tone: SandboxTone
   /** Short pill label. */
   label: string
@@ -27,6 +27,16 @@ export function describeSandbox(health: Health | undefined, opts: { loading?: bo
       }
     }
     return { kind: 'loading', tone: 'neutral', label: 'Checking sandbox…', description: 'Checking the sandbox status…' }
+  }
+  if (health.demo) {
+    return {
+      kind: 'demo',
+      tone: 'accent',
+      label: 'Demo mode',
+      description:
+        'Read-only online demo: you are exploring the recorded results of a real analysis of the demo project. ' +
+        'Nothing is uploaded and no code runs here. Install PréMoulinette to analyze your own project.',
+    }
   }
   const note = health.sandbox_note?.trim()
   switch (health.sandbox_mode_effective) {

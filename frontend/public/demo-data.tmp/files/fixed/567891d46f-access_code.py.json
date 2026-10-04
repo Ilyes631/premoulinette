@@ -1,0 +1,1 @@
+{"path":"MysteryInc/FirstLaunch/access_code.py","content":"code = input(\"Enter access code: \")\n\n# Only the exact code opens the Mystery Machine\nif code == \"SCOOBY\":\n    print(\"Access granted. Welcome aboard!\")\nelse:\n    print(\"Access denied.\")\n","language":"python","size":185}

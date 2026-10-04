@@ -9,6 +9,7 @@ const PILL: Record<SandboxTone, string> = {
   warning: 'border-warning/30 bg-warning/10 text-warning hover:bg-warning/15',
   fail: 'border-fail/30 bg-fail/10 text-fail hover:bg-fail/15',
   neutral: 'border-border-strong bg-surface-2 text-fg-muted hover:text-fg',
+  accent: 'border-accent/30 bg-accent/10 text-accent-fg hover:bg-accent/15',
 }
 
 const DOT: Record<SandboxTone, string> = {
@@ -16,6 +17,7 @@ const DOT: Record<SandboxTone, string> = {
   warning: 'bg-warning',
   fail: 'bg-fail',
   neutral: 'bg-fg-subtle',
+  accent: 'bg-accent',
 }
 
 /** Top-bar pill showing where student code will run. Always links to the sandbox settings. */

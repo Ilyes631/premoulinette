@@ -6,12 +6,19 @@ import { useSyncExternalStore } from 'react'
 
 export type ToastTone = 'neutral' | 'success' | 'error' | 'warning'
 
+/** Optional link rendered under the description (opens in a new tab when external). */
+export interface ToastAction {
+  label: string
+  href: string
+}
+
 export interface ToastItem {
   id: number
   title: string
   description?: string
   tone: ToastTone
   durationMs: number
+  action?: ToastAction
 }
 
 export interface ToastInput {
@@ -19,6 +26,7 @@ export interface ToastInput {
   description?: string
   tone?: ToastTone
   durationMs?: number
+  action?: ToastAction
 }
 
 const MAX_TOASTS = 4
@@ -46,6 +54,7 @@ export function toast(input: ToastInput): number {
     description: input.description,
     tone: input.tone ?? 'neutral',
     durationMs: input.durationMs ?? (input.tone === 'error' ? 7000 : 4000),
+    action: input.action,
   }
   items = [...items, item].slice(-MAX_TOASTS)
   timers.set(item.id, setTimeout(() => dismissToast(item.id), item.durationMs))

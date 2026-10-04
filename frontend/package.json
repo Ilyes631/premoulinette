@@ -6,9 +6,11 @@
   "scripts": {
     "dev": "vite",
     "build": "tsc -b && vite build",
+    "build:demo": "vite build --mode demo",
     "typecheck": "tsc -b",
     "lint": "oxlint",
     "preview": "vite preview",
+    "preview:demo": "vite preview --mode demo --port 4174 --strictPort",
     "test": "vitest run",
     "test:watch": "vitest"
   },

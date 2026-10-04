@@ -1,5 +1,6 @@
 import { Box, CalendarClock, FolderGit2, RotateCw, ShieldAlert, ShieldCheck, Timer } from 'lucide-react'
 import { Badge, Button, Kbd, Tooltip } from '@/components/ui'
+import { IS_DEMO } from '@/lib/demo/config'
 import { formatDateTime, formatDuration, formatRelativeTime } from '@/lib/format'
 import type { AnalysisReport, SandboxInfo } from '@/lib/types'
 import { ExportMenu } from './export-menu'
@@ -70,15 +71,20 @@ export function ResultsHeader({ report, onReanalyze, reanalyzing }: ResultsHeade
           </Badge>
         </div>
       </div>
-      <div className="flex shrink-0 items-center gap-2">
-        <ExportMenu analysisId={report.id} />
-        <Tooltip content="Run a new analysis of the same project (picks up your latest edits)">
-          <Button variant="primary" onClick={onReanalyze} loading={reanalyzing} aria-keyshortcuts="r">
-            {!reanalyzing && <RotateCw aria-hidden />}
-            Re-analyze
-            <Kbd className="ml-0.5 hidden border-white/25 bg-white/10 text-white/80 shadow-none sm:inline-flex">R</Kbd>
-          </Button>
-        </Tooltip>
+      <div className="flex shrink-0 flex-col items-start gap-1.5 md:items-end">
+        <div className="flex items-center gap-2">
+          <ExportMenu analysisId={report.id} />
+          <Tooltip content="Run a new analysis of the same project (picks up your latest edits)">
+            <Button variant="primary" onClick={onReanalyze} loading={reanalyzing} aria-keyshortcuts="r">
+              {!reanalyzing && <RotateCw aria-hidden />}
+              Re-analyze
+              <Kbd className="ml-0.5 hidden border-white/25 bg-white/10 text-white/80 shadow-none sm:inline-flex">R</Kbd>
+            </Button>
+          </Tooltip>
+        </div>
+        {IS_DEMO && report.score.verdict !== 'ready' && (
+          <p className="text-2xs text-fg-subtle">Demo: Re-analyze runs the project after the student's fixes.</p>
+        )}
       </div>
     </header>
   )

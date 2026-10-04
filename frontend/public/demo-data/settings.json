@@ -1,0 +1,1 @@
+{"sandbox_mode":"local","local_mode_acknowledged":true,"docker_image":"python:3.12-slim","ai_enabled":false,"ai_model":"claude-opus-5-5","ai_consent_subject":false,"ai_consent_code":false,"explanation_language":"fr","default_timeout_s":5.0,"has_api_key":false,"api_key_source":null}
