@@ -44,7 +44,7 @@ export const API_BASE = '/api'
 export const CSRF_HEADER = 'X-PreMoulinette'
 
 const OFFLINE_MESSAGE =
-  'Cannot reach the PréMoulinette server. Start it with "python -m premoulinette" and retry.'
+  'PréMoulinette is not running. Double-click start.bat (keep its black window open), wait 10 seconds, then retry.'
 
 // ---------------------------------------------------------------------------------------------
 // Core request helper

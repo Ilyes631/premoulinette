@@ -31,7 +31,7 @@ export function SandboxBanner() {
           </p>
           <p className="mt-0.5 text-fg-muted">
             {offline
-              ? 'Start it with "python -m premoulinette", then reload this page.'
+              ? 'Double-click start.bat (keep its black window open), then reload this page.'
               : status.description}
           </p>
         </div>

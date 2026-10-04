@@ -23,7 +23,7 @@ export function describeSandbox(health: Health | undefined, opts: { loading?: bo
         kind: 'offline',
         tone: 'fail',
         label: 'Server offline',
-        description: 'Cannot reach the PréMoulinette server. Start it with "python -m premoulinette".',
+        description: 'PréMoulinette is not running. Double-click start.bat and keep its black window open.',
       }
     }
     return { kind: 'loading', tone: 'neutral', label: 'Checking sandbox…', description: 'Checking the sandbox status…' }
