@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<style>
+  html, body { margin: 0; padding: 0; background: #000; }
+  .wrap { position: relative; width: 1440px; height: 900px; font-family: "Segoe UI", Arial, sans-serif; }
+  .wrap img { display: block; width: 1440px; height: 900px; filter: brightness(0.82); }
+  .ring { position: absolute; border: 4px solid #ff3b5c; border-radius: 12px; box-shadow: 0 0 0 4px rgba(255,59,92,.25); }
+  .num { position: absolute; width: 46px; height: 46px; border-radius: 50%; background: #ff3b5c; color: #fff;
+         font-weight: 800; font-size: 26px; display: flex; align-items: center; justify-content: center;
+         box-shadow: 0 4px 14px rgba(0,0,0,.6); }
+  .tip { position: absolute; background: #fff; color: #111; border-radius: 10px; padding: 10px 14px; font-size: 19px;
+         line-height: 1.3; font-weight: 600; box-shadow: 0 6px 20px rgba(0,0,0,.55); max-width: 360px; }
+  .tip small { display: block; font-weight: 500; font-size: 15px; color: #444; margin-top: 3px; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <img src="home.png" alt="">
+
+  <!-- A: subject -->
+  <div class="ring" style="left:186px; top:514px; width:508px; height:190px;"></div>
+  <div class="num" style="left:160px; top:490px;">A</div>
+  <div class="tip" style="left:200px; top:420px;">Glisse ici le fichier du SUJET<small>(la consigne enregistrée avec Ctrl + S)</small></div>
+
+  <!-- 1: Local folder tab -->
+  <div class="ring" style="left:748px; top:516px; width:132px; height:38px;"></div>
+  <div class="num" style="left:722px; top:492px;">1</div>
+
+  <!-- 2: path field -->
+  <div class="ring" style="left:760px; top:604px; width:350px; height:42px;"></div>
+  <div class="num" style="left:734px; top:580px;">2</div>
+
+  <!-- 3: Use folder -->
+  <div class="ring" style="left:1112px; top:604px; width:128px; height:42px;"></div>
+  <div class="num" style="left:1210px; top:578px;">3</div>
+
+  <div class="tip" style="left:1010px; top:322px; max-width:400px;">
+    1. Clique sur « Local folder »<br>
+    2. Clique dans la case blanche et colle l'adresse de ton dossier (Ctrl + V)<br>
+    3. Clique sur « Use folder »
+  </div>
+
+  <!-- 4: Analyze -->
+  <div class="ring" style="left:1014px; top:750px; width:248px; height:54px;"></div>
+  <div class="num" style="left:988px; top:726px;">4</div>
+  <div class="tip" style="left:600px; top:828px; max-width:520px;">4. Quand les 2 cases ont un ✓ vert : clique ici pour vérifier ton TP</div>
+</div>
+</body>
+</html>

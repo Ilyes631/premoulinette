@@ -107,7 +107,10 @@ Tu vois cette page, avec **deux grandes cases** :
 3. La case affiche le nom du TP et un ✓ vert. C'est bon.
 
 ### Étape 4 : donner ton travail à PréMoulinette
-Il faut dire à PréMoulinette **où est le dossier de ton TP**.
+Il faut dire à PréMoulinette **où est le dossier de ton TP**. Voici où cliquer (A = le sujet de l'étape 3,
+puis **1 → 2 → 3** pour ton travail, puis **4** pour lancer) :
+
+![Où cliquer](docs/screenshots/guide-etapes.png)
 
 1. Ouvre le dossier de ton TP, comme quand tu cherches un fichier.
 2. Clique **une fois** dans la **barre d'adresse**, tout en haut de la fenêtre du dossier.
