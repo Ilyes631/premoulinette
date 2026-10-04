@@ -1,0 +1,60 @@
+TP 2 - Calculs de base
+
+Cours : Programmation S1
+Date limite : lundi 9h00
+
+Rendu
+
+Votre dépôt doit respecter l'arborescence suivante :
+
+tp2/
+├── calcul.py
+├── parite.py
+├── saluer.py
+└── bonus/
+    └── carre.py
+
+Les fichiers du dossier bonus/ sont facultatifs.
+
+Règles
+
+Fonctions autorisées : print, input, len
+Fonctions interdites : abs(), pow()
+
+Exercice 1 - Double
+
+Fichier : tp2/calcul.py
+
+def double(n: int) -> int:
+
+double(4) -> 8
+double(-1) -> -2
+
+Exercice 2 - Parité
+
+Fichier : parite.py
+
+def est_pair(n: int) -> bool:
+
+Renvoie `True` si `n % 2 == 0`, sinon renvoie `False`.
+
+est_pair(4) == True
+est_pair(7) == False
+
+Exercice 3 - Salutation
+
+Fichier : saluer.py
+
+Le programme demande le prénom avec le message "Ton prénom : " puis affiche Bonjour suivi du prénom.
+
+42sh$ python3 saluer.py
+Ton prénom : Alice
+Bonjour Alice
+
+Bonus 1 - Carré
+
+Fichier : tp2/bonus/carre.py
+
+def carre(x: int) -> int:
+
+carre(3) -> 9

@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>TP 1 — MysteryInc: First Launch</title>
+<style>
+  body { font-family: Georgia, serif; max-width: 860px; margin: 40px auto; padding: 0 20px; color: #222; line-height: 1.55; }
+  h1 { font-size: 2em; border-bottom: 3px solid #4b2e83; padding-bottom: .3em; }
+  h2 { color: #4b2e83; margin-top: 2.2em; }
+  h3 { color: #333; }
+  code { background: #f2f0f7; padding: 1px 4px; border-radius: 3px; font-size: .92em; }
+  pre { background: #1e1b2e; color: #eee; padding: 14px 16px; border-radius: 6px; overflow-x: auto; }
+  pre code { background: none; color: inherit; padding: 0; }
+  pre.terminal kbd { color: #ffd166; font-family: inherit; font-weight: bold; }
+  .note { border-left: 4px solid #4b2e83; background: #f6f4fb; padding: 8px 14px; }
+  .warning { border-left: 4px solid #c0392b; background: #fbf1f0; padding: 8px 14px; }
+  table { border-collapse: collapse; } td, th { border: 1px solid #ccc; padding: 4px 10px; }
+</style>
+</head>
+<body>
+
+<h1>TP 1 — MysteryInc: First Launch</h1>
+<p><strong>Course:</strong> Programming S1 — Python &nbsp;·&nbsp; <strong>Deadline:</strong> Sunday 23:42</p>
+
+<p>The Mystery Inc. gang just bought a brand new rocket-powered Mystery Machine. Before its first launch,
+Velma needs a few reliable tools: temperature conversion, speed checks, landing grades and an
+interactive launch assistant. Your mission is to write them.</p>
+
+<h2>Submission</h2>
+
+<p>Your repository must respect <strong>exactly</strong> the following architecture:</p>
+
+<pre>
+.gitignore
+MysteryInc/
+└── FirstLaunch/
+    ├── flight_functions/
+    │   ├── grade_landing.py
+    │   ├── kelvin.py
+    │   └── safe_speed.py
+    ├── route_math/
+    │   ├── fuel_share.py
+    │   └── mission_clock.py
+    ├── bonus/
+    │   ├── countdown.py
+    │   └── max_altitude.py
+    ├── FIXME2.py
+    ├── access_code.py
+    └── launch_sequence.py
+</pre>
+
+<p>The files in <code>bonus/</code> are optional. Your repository must contain a <code>.gitignore</code> file.</p>
+
+<div class="warning">
+<p>Do not push <code>__pycache__</code> folders, <code>.pyc</code> files or any temporary file
+(<code>.DS_Store</code>, <code>*~</code>). Any forbidden file in your repository is penalized.</p>
+</div>
+
+<p>To submit, push a tag <code>submit-*</code>. You only have a <strong>limited number of submissions</strong>.</p>
+
+<h2>Rules</h2>
+
+<p>Authorized builtins:</p>
+<ul>
+  <li><code>input()</code></li>
+  <li><code>print()</code></li>
+  <li><code>len()</code></li>
+  <li><code>int()</code></li>
+  <li><code>str()</code></li>
+  <li><code>float()</code></li>
+  <li><code>bool()</code></li>
+</ul>
+
+<p>Forbidden builtins: <code>abs()</code>, <code>max()</code>, <code>min()</code>, <code>round()</code>,
+<code>sorted()</code>, <code>sum()</code>, <code>eval()</code>.</p>
+
+<p>No import is allowed.</p>
+
+<div class="note">
+<p>Your functions must <strong>return</strong> their result: they must not print anything. Files containing
+functions must not execute any code when they are imported (no debug <code>print</code> left at the
+top level).</p>
+</div>
+
+<h2>Exercise 1 — Kelvin</h2>
+
+<p>File: <code>MysteryInc/FirstLaunch/flight_functions/kelvin.py</code></p>
+
+<pre><code class="language-python">def to_kelvin(celsius: float) -&gt; float:
+</code></pre>
+
+<p>Return the temperature converted to Kelvin: <code>celsius + 273.15</code>.</p>
+
+<pre><code class="language-python">&gt;&gt;&gt; to_kelvin(0)
+273.15
+&gt;&gt;&gt; to_kelvin(100)
+373.15
+&gt;&gt;&gt; to_kelvin(-273.15)
+0.0
+</code></pre>
+
+<h2>Exercise 2 — Safe speed</h2>
+
+<p>File: <code>MysteryInc/FirstLaunch/flight_functions/safe_speed.py</code></p>
+
+<pre><code class="language-python">def is_safe(speed: int, limit: int) -&gt; bool:
+</code></pre>
+
+<p>Return <code>True</code> if <code>speed &lt;= limit</code>, otherwise return <code>False</code>.
+The result must be a real boolean, not a string.</p>
+
+<pre><code class="language-python">&gt;&gt;&gt; is_safe(200, 250)
+True
+&gt;&gt;&gt; is_safe(300, 250)
+False
+</code></pre>
+
+<h2>Exercise 3 — Landing grade</h2>
+
+<p>File: <code>MysteryInc/FirstLaunch/flight_functions/grade_landing.py</code></p>
+
+<pre><code class="language-python">def landing_grade(vertical_speed: int) -&gt; str:
+</code></pre>
+
+<p>Grade the landing according to the vertical speed (in m/s):</p>
+<ul>
+  <li><code>vertical_speed &lt;= 2</code> → <code>"Perfect touchdown"</code></li>
+  <li><code>2 &lt; vertical_speed &lt;= 5</code> → <code>"Hard landing"</code></li>
+  <li><code>vertical_speed &gt; 5</code> → <code>"Crash!"</code></li>
+</ul>
+
+<pre><code class="language-python">&gt;&gt;&gt; landing_grade(1)
+'Perfect touchdown'
+&gt;&gt;&gt; landing_grade(4)
+'Hard landing'
+&gt;&gt;&gt; landing_grade(9)
+'Crash!'
+</code></pre>
+
+<h2>Exercise 4 — Fuel share</h2>
+
+<p>File: <code>MysteryInc/FirstLaunch/route_math/fuel_share.py</code></p>
+
+<pre><code class="language-python">def fuel_share(total_fuel: int, crew: int) -&gt; int:
+def remaining_fuel(total_fuel: int, crew: int) -&gt; int:
+</code></pre>
+
+<p><code>fuel_share</code> returns the amount of fuel each crew member receives:
+<code>total_fuel // crew</code>. <code>remaining_fuel</code> returns what is left in the tank once the
+fuel has been shared: <code>total_fuel % crew</code>. You can assume <code>crew &gt; 0</code>.</p>
+
+<pre><code class="language-python">&gt;&gt;&gt; fuel_share(400, 3)
+133
+&gt;&gt;&gt; remaining_fuel(400, 3)
+1
+&gt;&gt;&gt; fuel_share(500, 3)
+166
+</code></pre>
+
+<h2>Exercise 5 — Mission clock</h2>
+
+<p>File: <code>MysteryInc/FirstLaunch/route_math/mission_clock.py</code></p>
+
+<pre><code class="language-python">def mission_clock(seconds: int) -&gt; str:
+</code></pre>
+
+<p>Return the duration formatted as <code>HH:MM:SS</code>, each field on two digits:
+<code>f"{seconds // 3600:02}:{seconds % 3600 // 60:02}:{seconds % 60:02}"</code>.</p>
+
+<pre><code class="language-python">&gt;&gt;&gt; mission_clock(3725)
+'01:02:05'
+&gt;&gt;&gt; mission_clock(0)
+'00:00:00'
+</code></pre>
+
+<h2>Exercise 6 — FIXME</h2>
+
+<p>File: <code>MysteryInc/FirstLaunch/FIXME2.py</code></p>
+
+<p>Shaggy wrote this function but it does not work. Fix it.</p>
+
+<pre><code class="language-python">def average_speed(distance: float, hours: float) -&gt; float:
+</code></pre>
+
+<ul>
+  <li><code>hours == 0</code> → <code>0.0</code></li>
+  <li>otherwise → <code>distance / hours</code></li>
+</ul>
+
+<pre><code class="language-python">&gt;&gt;&gt; average_speed(150.0, 2.0)
+75.0
+&gt;&gt;&gt; average_speed(10.0, 0.0)
+0.0
+</code></pre>
+
+<h2>Exercise 7 — Access code</h2>
+
+<p>File: <code>MysteryInc/FirstLaunch/access_code.py</code></p>
+
+<p>Write a program that asks for the access code with the prompt <code>"Enter access code: "</code>.
+If the code is exactly <code>SCOOBY</code> (case-sensitive), print <code>Access granted. Welcome aboard!</code>,
+otherwise print <code>Access denied.</code></p>
+
+<pre class="terminal">42sh$ python3 access_code.py
+Enter access code: <kbd>SCOOBY</kbd>
+Access granted. Welcome aboard!
+42sh$ python3 access_code.py
+Enter access code: <kbd>scooby</kbd>
+Access denied.
+</pre>
+
+<h2>Exercise 8 — Launch sequence</h2>
+
+<p>File: <code>MysteryInc/FirstLaunch/launch_sequence.py</code></p>
+
+<p>Write the interactive launch assistant. It asks, in this order:</p>
+<ol>
+  <li>the pilot name with the prompt <code>"Pilot name: "</code>;</li>
+  <li>the starting fuel with the prompt <code>"Starting fuel: "</code>;</li>
+  <li>the destination, after displaying the menu below, with the prompt <code>"Your choice: "</code>.</li>
+</ol>
+
+<p>Fuel cost per destination: Crystal Cove <code>50</code>, The Old Mill <code>120</code>,
+Spooky Swamp <code>200</code>. If the fuel is not enough, print <code>Not enough fuel! The gang stays home.</code>
+and stop. Otherwise print the destination and the remaining fuel, then ask
+<code>"Set a trap or collect evidence? (trap/evidence) "</code>.</p>
+
+<p>Your output must match the examples <strong>exactly</strong> (spaces and punctuation included).</p>
+
+<pre class="terminal">42sh$ python3 launch_sequence.py
+Pilot name: <kbd>Camille</kbd>
+Starting fuel: <kbd>400</kbd>
+Where's the Mystery Machine headed today?
+1 - Crystal Cove
+2 - The Old Mill
+3 - Spooky Swamp
+Your choice: <kbd>2</kbd>
+Destination: The Old Mill
+Fuel after the trip: 280
+Set a trap or collect evidence? (trap/evidence) <kbd>trap</kbd>
+Camille sets a trap at The Old Mill. Zoinks!
+</pre>
+
+<pre class="terminal">42sh$ python3 launch_sequence.py
+Pilot name: <kbd>Fred</kbd>
+Starting fuel: <kbd>100</kbd>
+Where's the Mystery Machine headed today?
+1 - Crystal Cove
+2 - The Old Mill
+3 - Spooky Swamp
+Your choice: <kbd>3</kbd>
+Not enough fuel! The gang stays home.
+</pre>
+
+<pre class="terminal">42sh$ python3 launch_sequence.py
+Pilot name: <kbd>Velma</kbd>
+Starting fuel: <kbd>250</kbd>
+Where's the Mystery Machine headed today?
+1 - Crystal Cove
+2 - The Old Mill
+3 - Spooky Swamp
+Your choice: <kbd>1</kbd>
+Destination: Crystal Cove
+Fuel after the trip: 200
+Set a trap or collect evidence? (trap/evidence) <kbd>evidence</kbd>
+Velma collects evidence at Crystal Cove. Jinkies!
+</pre>
+
+<h2>Bonus</h2>
+
+<p>Bonus exercises are optional. They are only taken into account if every mandatory exercise works.</p>
+
+<h3>Bonus 1 — Emoji grade</h3>
+
+<p>File: <code>MysteryInc/FirstLaunch/flight_functions/grade_landing.py</code></p>
+
+<pre><code class="language-python">def emoji_grade(vertical_speed: int) -&gt; str:
+</code></pre>
+
+<ul>
+  <li><code>vertical_speed &lt;= 2</code> → <code>"🟢"</code></li>
+  <li><code>2 &lt; vertical_speed &lt;= 5</code> → <code>"🟡"</code></li>
+  <li><code>vertical_speed &gt; 5</code> → <code>"🔴"</code></li>
+</ul>
+
+<pre><code class="language-python">&gt;&gt;&gt; emoji_grade(0)
+'🟢'
+&gt;&gt;&gt; emoji_grade(7)
+'🔴'
+</code></pre>
+
+<h3>Bonus 2 — Max altitude</h3>
+
+<p>File: <code>MysteryInc/FirstLaunch/bonus/max_altitude.py</code></p>
+
+<pre><code class="language-python">def max_altitude(a: int, b: int, c: int) -&gt; int:
+</code></pre>
+
+<p>Return the highest of the three altitudes. Remember: <code>max()</code> is forbidden.</p>
+
+<pre><code class="language-python">&gt;&gt;&gt; max_altitude(120, 450, 300)
+450
+&gt;&gt;&gt; max_altitude(-5, -2, -9)
+-2
+</code></pre>
+
+<h3>Bonus 3 — Countdown</h3>
+
+<p>File: <code>MysteryInc/FirstLaunch/bonus/countdown.py</code></p>
+
+<p>Ask for a number with the prompt <code>"Countdown start: "</code>, then print every number down to
+<code>1</code>, one per line, followed by <code>Liftoff!</code>.</p>
+
+<pre class="terminal">42sh$ python3 countdown.py
+Countdown start: <kbd>3</kbd>
+3
+2
+1
+Liftoff!
+</pre>
+
+<p>Good luck, and watch out for the ghosts!</p>
+
+</body>
+</html>

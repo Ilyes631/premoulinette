@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" fill="none">
+  <rect width="32" height="32" rx="8" fill="#5b57f5"/>
+  <g fill="#fff">
+    <path d="M16 16V7.5a5 5 0 0 1 5 5V16Z"/>
+    <path d="M16 16h8.5a5 5 0 0 1-5 5H16Z" opacity=".78"/>
+    <path d="M16 16v8.5a5 5 0 0 1-5-5V16Z" opacity=".56"/>
+    <path d="M16 16H7.5a5 5 0 0 1 5-5H16Z" opacity=".34"/>
+  </g>
+  <circle cx="16" cy="16" r="1.6" fill="#5b57f5"/>
+</svg>

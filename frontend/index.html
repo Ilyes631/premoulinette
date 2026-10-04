@@ -1,0 +1,26 @@
+<!doctype html>
+<html lang="en" data-theme="dark">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="color-scheme" content="dark light" />
+    <meta name="description" content="PréMoulinette — test your Python project before the real submission." />
+    <title>PréMoulinette</title>
+    <script>
+      // Resolve the theme before first paint to avoid a light/dark flash.
+      ;(function () {
+        var pref = 'system'
+        try {
+          pref = localStorage.getItem('premoulinette.theme') || 'system'
+        } catch (e) {}
+        var dark = pref === 'dark' || (pref !== 'light' && !window.matchMedia('(prefers-color-scheme: light)').matches)
+        document.documentElement.setAttribute('data-theme', dark ? 'dark' : 'light')
+      })()
+    </script>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>

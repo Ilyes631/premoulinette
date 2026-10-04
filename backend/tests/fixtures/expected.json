@@ -1,0 +1,246 @@
+{
+  "schema_version": 1,
+  "subject": "demo/subject_demo.html",
+  "semantics": {
+    "verdict": "ScoreSummary.verdict expected for the project analysed against the demo subject (heuristic parse, unreviewed spec).",
+    "bonus_completion": "Expected ScoreSummary.bonus_completion (percent).",
+    "detections": "REQUIRED checks. For each entry, at least `min_count` (default 1) CheckResults whose id starts with `id_prefix` must match every given field: `status` (string or list of accepted values), `diagnosis` (string, list of accepted values, or null = not constrained), `severity` (same rules; key absent = not constrained), `line` (location.line, key absent = not constrained).",
+    "tolerated": "Id prefixes of knock-on checks that MAY be fail/skipped (they depend on implementation choices, e.g. a function check skipped when its file is missing).",
+    "must_pass": "Id prefixes that must match at least one check, and every matching check must have status 'pass' (proves the mutation is isolated).",
+    "exhaustive": "If true, every mandatory check with status 'fail' or 'skipped' must match a `detections` or `tolerated` prefix. Heuristic tests (status 'warning', mandatory=False) are never counted.",
+    "ids": "Test ids follow ARCHITECTURE.md: '<function>#ex<n>' (explicit, 1-based), '<function>#derived<n>', '<exercise_id>#session<n>'. Prefixes such as 'test:fuel_share#ex' are used where the exact <n> is an implementation detail."
+  },
+  "variants": {
+    "correct_project": {
+      "path": "backend/tests/fixtures/projects/correct_project",
+      "mutation": "None: byte-exact copy of demo/projects/mysteryinc_fixed.",
+      "verdict": "ready",
+      "mandatory_readiness": 100.0,
+      "bonus_completion": 100.0,
+      "detections": [],
+      "tolerated": [],
+      "must_pass": [
+        "structure:file:",
+        "syntax:",
+        "function:",
+        "test:to_kelvin#ex",
+        "test:is_safe#ex",
+        "test:landing_grade#ex",
+        "test:fuel_share#ex",
+        "test:remaining_fuel#ex",
+        "test:mission_clock#ex",
+        "test:average_speed#ex",
+        "test:emoji_grade#ex",
+        "test:max_altitude#ex",
+        "test:access_code#session",
+        "test:launch_sequence#session",
+        "test:countdown#session"
+      ],
+      "exhaustive": true
+    },
+    "wrong_bool_type": {
+      "path": "backend/tests/fixtures/projects/wrong_bool_type",
+      "mutation": "flight_functions/safe_speed.py: `return True`/`return False` -> `return \"True\"`/`return \"False\"`.",
+      "verdict": "not_ready",
+      "detections": [
+        {"id_prefix": "returns:safe_speed:is_safe", "diagnosis": "str_instead_of_bool", "status": "fail", "severity": "major", "line": 4},
+        {"id_prefix": "test:is_safe#ex1", "diagnosis": "str_instead_of_bool", "status": "fail", "severity": "major"},
+        {"id_prefix": "test:is_safe#ex2", "diagnosis": "str_instead_of_bool", "status": "fail", "severity": "major"},
+        {"id_prefix": "test:is_safe#derived", "diagnosis": "str_instead_of_bool", "status": "fail", "severity": "major", "min_count": 1}
+      ],
+      "tolerated": ["test:is_safe#"],
+      "must_pass": [
+        "syntax:MysteryInc/FirstLaunch/flight_functions/safe_speed.py",
+        "function:safe_speed:is_safe",
+        "test:to_kelvin#ex",
+        "test:landing_grade#ex",
+        "test:launch_sequence#session"
+      ],
+      "exhaustive": true
+    },
+    "wrong_prompt": {
+      "path": "backend/tests/fixtures/projects/wrong_prompt",
+      "mutation": "launch_sequence.py: trap prompt \"Set a trap or collect evidence? (trap/evidence) \" -> \"... callect ...\" (one-letter typo).",
+      "verdict": "not_ready",
+      "detections": [
+        {"id_prefix": "prompt:launch_sequence:", "diagnosis": "prompt_mismatch", "status": "fail", "severity": "minor", "min_count": 1},
+        {"id_prefix": "test:launch_sequence#session1", "diagnosis": ["stdout_mismatch", "prompt_mismatch"], "status": "fail", "severity": "minor"},
+        {"id_prefix": "test:launch_sequence#session3", "diagnosis": ["stdout_mismatch", "prompt_mismatch"], "status": "fail", "severity": "minor"}
+      ],
+      "tolerated": [],
+      "must_pass": [
+        "test:launch_sequence#session2",
+        "test:access_code#session",
+        "test:countdown#session",
+        "syntax:MysteryInc/FirstLaunch/launch_sequence.py"
+      ],
+      "exhaustive": true
+    },
+    "missing_file": {
+      "path": "backend/tests/fixtures/projects/missing_file",
+      "mutation": "route_math/fuel_share.py deleted.",
+      "verdict": "not_ready",
+      "detections": [
+        {"id_prefix": "structure:file:MysteryInc/FirstLaunch/route_math/fuel_share.py", "diagnosis": "missing_file", "status": "fail", "severity": "critical"},
+        {"id_prefix": "test:fuel_share#ex", "diagnosis": null, "status": "skipped", "min_count": 2},
+        {"id_prefix": "test:remaining_fuel#ex", "diagnosis": null, "status": "skipped", "min_count": 1}
+      ],
+      "tolerated": [
+        "syntax:MysteryInc/FirstLaunch/route_math/fuel_share.py",
+        "function:fuel_share:",
+        "signature:fuel_share:",
+        "returns:fuel_share:",
+        "constraint:fuel_share:",
+        "import_effects:fuel_share",
+        "test:fuel_share#",
+        "test:remaining_fuel#"
+      ],
+      "must_pass": [
+        "structure:file:MysteryInc/FirstLaunch/route_math/mission_clock.py",
+        "test:mission_clock#ex",
+        "test:to_kelvin#ex"
+      ],
+      "exhaustive": true
+    },
+    "syntax_error": {
+      "path": "backend/tests/fixtures/projects/syntax_error",
+      "mutation": "FIXME2.py: `if hours == 0:` -> `if hours == 0` (missing colon, line 3).",
+      "verdict": "not_ready",
+      "detections": [
+        {"id_prefix": "syntax:MysteryInc/FirstLaunch/FIXME2.py", "diagnosis": "syntax_error", "status": "fail", "severity": "critical", "line": 3},
+        {"id_prefix": "test:average_speed#ex", "diagnosis": null, "status": "skipped", "min_count": 2}
+      ],
+      "tolerated": [
+        "function:FIXME2:",
+        "signature:FIXME2:",
+        "returns:FIXME2:",
+        "constraint:FIXME2:",
+        "import_effects:FIXME2",
+        "test:average_speed#"
+      ],
+      "must_pass": [
+        "structure:file:MysteryInc/FirstLaunch/FIXME2.py",
+        "syntax:MysteryInc/FirstLaunch/flight_functions/kelvin.py",
+        "test:to_kelvin#ex"
+      ],
+      "exhaustive": true
+    },
+    "forbidden_builtin": {
+      "path": "backend/tests/fixtures/projects/forbidden_builtin",
+      "mutation": "flight_functions/kelvin.py: `return celsius + 273.15 if abs(celsius) >= 0 else 0.0` (forbidden abs(), results unchanged).",
+      "verdict": "not_ready",
+      "detections": [
+        {"id_prefix": "constraint:kelvin:forbidden_builtin:abs", "diagnosis": "forbidden_builtin", "status": "fail", "severity": "critical", "line": 3}
+      ],
+      "tolerated": ["constraint:kelvin:builtin_not_allowed:abs"],
+      "must_pass": [
+        "function:kelvin:to_kelvin",
+        "test:to_kelvin#ex",
+        "syntax:MysteryInc/FirstLaunch/flight_functions/kelvin.py"
+      ],
+      "exhaustive": true
+    },
+    "wrong_function_name": {
+      "path": "backend/tests/fixtures/projects/wrong_function_name",
+      "mutation": "flight_functions/safe_speed.py: `def is_safe(` -> `def is_save(`.",
+      "verdict": "not_ready",
+      "detections": [
+        {"id_prefix": "function:safe_speed:is_safe", "diagnosis": "wrong_function_name", "status": "fail", "severity": "critical", "line": 1},
+        {"id_prefix": "test:is_safe#ex", "diagnosis": null, "status": "skipped", "min_count": 2}
+      ],
+      "tolerated": ["signature:safe_speed:", "returns:safe_speed:", "test:is_safe#"],
+      "must_pass": [
+        "syntax:MysteryInc/FirstLaunch/flight_functions/safe_speed.py",
+        "test:to_kelvin#ex",
+        "test:landing_grade#ex"
+      ],
+      "exhaustive": true
+    },
+    "missing_bonus": {
+      "path": "backend/tests/fixtures/projects/missing_bonus",
+      "mutation": "emoji_grade removed from flight_functions/grade_landing.py and the whole bonus/ folder deleted.",
+      "verdict": "ready",
+      "mandatory_readiness": 100.0,
+      "bonus_completion": 0.0,
+      "detections": [
+        {"id_prefix": "structure:file:MysteryInc/FirstLaunch/bonus/countdown.py", "diagnosis": "missing_bonus_file", "status": "bonus"},
+        {"id_prefix": "structure:file:MysteryInc/FirstLaunch/bonus/max_altitude.py", "diagnosis": "missing_bonus_file", "status": "bonus"},
+        {"id_prefix": "function:emoji_grade:emoji_grade", "diagnosis": ["missing_function", "bonus_not_implemented"], "status": "bonus"}
+      ],
+      "tolerated": [],
+      "must_pass": [
+        "function:grade_landing:landing_grade",
+        "test:landing_grade#ex",
+        "test:launch_sequence#session"
+      ],
+      "exhaustive": true
+    }
+  },
+  "demo_projects": {
+    "mysteryinc_fixed": {
+      "path": "demo/projects/mysteryinc_fixed",
+      "same_as_variant": "correct_project"
+    },
+    "mysteryinc_buggy": {
+      "path": "demo/projects/mysteryinc_buggy",
+      "mutation": "See docs/DEMO_EXPECTATIONS.md (18 deliberate issues).",
+      "verdict": "not_ready",
+      "detections": [
+        {"id_prefix": "structure:file:MysteryInc/FirstLaunch/route_math/mission_clock.py", "diagnosis": "misplaced_file", "status": "fail", "severity": "critical"},
+        {"id_prefix": "structure:file:MysteryInc/FirstLaunch/bonus/countdown.py", "diagnosis": "missing_bonus_file", "status": "bonus"},
+        {"id_prefix": "structure:parasite:MysteryInc/FirstLaunch/flight_functions/__pycache__", "diagnosis": "parasite_file", "status": "fail", "severity": "major"},
+        {"id_prefix": "structure:parasite:MysteryInc/.DS_Store", "diagnosis": "parasite_file", "status": "fail", "severity": "major"},
+        {"id_prefix": "structure:gitignore", "diagnosis": "missing_gitignore", "status": "fail"},
+        {"id_prefix": "syntax:MysteryInc/FirstLaunch/FIXME2.py", "diagnosis": "syntax_error", "status": "fail", "severity": "critical", "line": 3},
+        {"id_prefix": "test:average_speed#ex", "diagnosis": null, "status": "skipped", "min_count": 2},
+        {"id_prefix": "returns:safe_speed:is_safe", "diagnosis": "str_instead_of_bool", "status": "fail", "severity": "major", "line": 4},
+        {"id_prefix": "test:is_safe#ex1", "diagnosis": "str_instead_of_bool", "status": "fail", "severity": "major"},
+        {"id_prefix": "test:is_safe#ex2", "diagnosis": "str_instead_of_bool", "status": "fail", "severity": "major"},
+        {"id_prefix": "import_effects:kelvin", "diagnosis": "import_side_effects", "status": "warning", "severity": "major", "line": 6},
+        {"id_prefix": "test:landing_grade#derived", "diagnosis": ["wrong_string", "wrong_value"], "status": "fail", "severity": "major", "min_count": 1},
+        {"id_prefix": "function:emoji_grade:emoji_grade", "diagnosis": ["missing_function", "bonus_not_implemented"], "status": "bonus"},
+        {"id_prefix": "constraint:fuel_share:forbidden_builtin:round", "diagnosis": "forbidden_builtin", "status": "fail", "severity": "critical", "line": 3},
+        {"id_prefix": "test:fuel_share#ex", "diagnosis": "wrong_value", "status": "fail", "severity": "major", "min_count": 1},
+        {"id_prefix": "function:fuel_share:remaining_fuel", "diagnosis": "wrong_function_name", "status": "fail", "severity": "critical", "line": 6},
+        {"id_prefix": "test:remaining_fuel#ex", "diagnosis": null, "status": "skipped", "min_count": 1},
+        {"id_prefix": "returns:mission_clock:mission_clock", "diagnosis": "prints_instead_of_returns", "status": "fail", "severity": "major"},
+        {"id_prefix": "test:mission_clock#ex", "diagnosis": "prints_instead_of_returns", "status": "fail", "severity": "major", "min_count": 2},
+        {"id_prefix": "test:access_code#session2", "diagnosis": "stdout_mismatch", "status": "fail", "severity": "major"},
+        {"id_prefix": "prompt:launch_sequence:", "diagnosis": "prompt_mismatch", "status": "fail", "severity": "minor", "min_count": 2},
+        {"id_prefix": "test:launch_sequence#session", "diagnosis": ["stdout_mismatch", "prompt_mismatch"], "status": "fail", "min_count": 3},
+        {"id_prefix": "constraint:max_altitude:forbidden_builtin:max", "diagnosis": "forbidden_builtin", "status": "bonus", "line": 2}
+      ],
+      "tolerated": [
+        "structure:file:.gitignore",
+        "structure:extra:MysteryInc/FirstLaunch/mission_clock.py",
+        "constraint:fuel_share:builtin_not_allowed:round",
+        "constraint:max_altitude:builtin_not_allowed:max",
+        "signature:fuel_share:remaining_fuel",
+        "returns:fuel_share:remaining_fuel",
+        "function:FIXME2:",
+        "signature:FIXME2:",
+        "returns:FIXME2:",
+        "import_effects:FIXME2",
+        "test:is_safe#",
+        "test:fuel_share#",
+        "test:remaining_fuel#",
+        "test:mission_clock#",
+        "test:average_speed#",
+        "test:landing_grade#derived",
+        "test:emoji_grade#",
+        "test:countdown#"
+      ],
+      "must_pass": [
+        "test:fuel_share#ex1",
+        "test:to_kelvin#ex",
+        "test:landing_grade#ex",
+        "test:access_code#session1",
+        "test:max_altitude#ex",
+        "function:kelvin:to_kelvin",
+        "function:safe_speed:is_safe",
+        "function:fuel_share:fuel_share"
+      ],
+      "exhaustive": true
+    }
+  }
+}

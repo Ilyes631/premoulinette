@@ -1,0 +1,12 @@
+/** Result components shared by the results, report and history screens. */
+export { CheckDetail, checkSourceLocation, type CheckDetailProps } from './check-detail'
+export { CheckRow, checkLocationLabel, type CheckRowProps } from './check-row'
+export { ChangedBlock, EqualRow, SourceChip } from './diff/diff-rows'
+export { DiffView, type DiffViewProps } from './diff/diff-view'
+export { VisibleText } from './diff/visible-text'
+export { EvidenceView } from './evidence-view'
+export { EXPLAIN_MODE_LABELS, ExplanationPanel, type ExplanationState } from './explanation-panel'
+export { FixPreview } from './fix-preview'
+export { ProvenanceLine } from './provenance-line'
+export { TranscriptView, type TranscriptStep, type TranscriptViewProps } from './transcript-view'
+export { ValueCompare, type ValueCompareProps } from './value-compare'

@@ -1,0 +1,18 @@
+{
+  "name": "premoulinette",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Local pre-grader: test your programming assignment against its subject before the real submission.",
+  "scripts": {
+    "setup": "node scripts/setup.mjs",
+    "dev": "node scripts/dev.mjs",
+    "build": "npm --prefix frontend run build",
+    "start": "node scripts/start.mjs",
+    "test": "node scripts/test.mjs",
+    "test:backend": "node scripts/test.mjs backend",
+    "test:frontend": "npm --prefix frontend test"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}

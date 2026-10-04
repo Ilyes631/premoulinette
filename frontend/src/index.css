@@ -1,0 +1,285 @@
+@import 'tailwindcss';
+
+/* Theme is driven by data-theme on <html> (set before paint in index.html, managed by ThemeProvider). */
+@custom-variant dark (&:where([data-theme='dark'], [data-theme='dark'] *));
+
+/* ------------------------------------------------------------------------------------------
+ * Design tokens. Components only use the semantic utilities generated from @theme below
+ * (bg-surface, text-fg-muted, border-border, text-pass, bg-fail/10...), never raw hex values.
+ * ---------------------------------------------------------------------------------------- */
+:root,
+[data-theme='dark'] {
+  color-scheme: dark;
+  --pm-bg: #0a0a0b;
+  --pm-bg-subtle: #0d0d0f;
+  --pm-surface: #111113;
+  --pm-surface-2: #17171a;
+  --pm-surface-3: #1e1e22;
+  --pm-border: rgb(255 255 255 / 0.07);
+  --pm-border-strong: rgb(255 255 255 / 0.12);
+  --pm-highlight: rgb(255 255 255 / 0.045);
+  --pm-shadow: rgb(0 0 0 / 0.5);
+
+  --pm-fg: #ededef;
+  --pm-fg-muted: #a1a1aa;
+  --pm-fg-subtle: #80808a;
+
+  --pm-accent: #5b57f5;
+  --pm-accent-hover: #6a66ff;
+  --pm-accent-fg: #a5a3ff;
+  --pm-accent-contrast: #ffffff;
+  --pm-ring: #8b88ff;
+
+  --pm-pass: #34d399;
+  --pm-fail: #fb7185;
+  --pm-warning: #fbbf24;
+  --pm-info: #38bdf8;
+  --pm-bonus: #c084fc;
+  --pm-skipped: #a1a1aa;
+
+  --pm-sev-critical: #fb7185;
+  --pm-sev-major: #fb923c;
+  --pm-sev-minor: #d4d4d8;
+  --pm-sev-style: #8f8f99;
+
+  --pm-code-bg: #0d0d0f;
+  --pm-terminal-bg: #0b0b0d;
+  --pm-terminal-fg: #e4e4e7;
+  --pm-syn-keyword: #ff8b7a;
+  --pm-syn-string: #9bd3ff;
+  --pm-syn-number: #79b8ff;
+  --pm-syn-comment: #7d8590;
+  --pm-syn-function: #d6b8ff;
+  --pm-syn-builtin: #ffb070;
+  --pm-syn-decorator: #d6b8ff;
+}
+
+[data-theme='light'] {
+  color-scheme: light;
+  --pm-bg: #fafafb;
+  --pm-bg-subtle: #f4f4f6;
+  --pm-surface: #ffffff;
+  --pm-surface-2: #f5f5f7;
+  --pm-surface-3: #ececf0;
+  --pm-border: rgb(16 16 28 / 0.09);
+  --pm-border-strong: rgb(16 16 28 / 0.15);
+  --pm-highlight: rgb(255 255 255 / 0.9);
+  --pm-shadow: rgb(16 16 28 / 0.12);
+
+  --pm-fg: #17171c;
+  --pm-fg-muted: #52525b;
+  --pm-fg-subtle: #686874;
+
+  --pm-accent: #5450ee;
+  --pm-accent-hover: #4743e0;
+  --pm-accent-fg: #4338ca;
+  --pm-accent-contrast: #ffffff;
+  --pm-ring: #5450ee;
+
+  --pm-pass: #047857;
+  --pm-fail: #be123c;
+  --pm-warning: #b45309;
+  --pm-info: #0369a1;
+  --pm-bonus: #7e22ce;
+  --pm-skipped: #52525b;
+
+  --pm-sev-critical: #be123c;
+  --pm-sev-major: #c2410c;
+  --pm-sev-minor: #3f3f46;
+  --pm-sev-style: #686874;
+
+  --pm-code-bg: #f7f7f9;
+  --pm-terminal-bg: #111114;
+  --pm-terminal-fg: #e4e4e7;
+  --pm-syn-keyword: #c8102e;
+  --pm-syn-string: #0a3d75;
+  --pm-syn-number: #0550ae;
+  --pm-syn-comment: #6b7280;
+  --pm-syn-function: #7c3aed;
+  --pm-syn-builtin: #9a3b00;
+  --pm-syn-decorator: #7c3aed;
+}
+
+@theme inline {
+  --color-bg: var(--pm-bg);
+  --color-bg-subtle: var(--pm-bg-subtle);
+  --color-surface: var(--pm-surface);
+  --color-surface-2: var(--pm-surface-2);
+  --color-surface-3: var(--pm-surface-3);
+  --color-border: var(--pm-border);
+  --color-border-strong: var(--pm-border-strong);
+
+  --color-fg: var(--pm-fg);
+  --color-fg-muted: var(--pm-fg-muted);
+  --color-fg-subtle: var(--pm-fg-subtle);
+
+  --color-accent: var(--pm-accent);
+  --color-accent-hover: var(--pm-accent-hover);
+  --color-accent-fg: var(--pm-accent-fg);
+  --color-accent-contrast: var(--pm-accent-contrast);
+  --color-ring: var(--pm-ring);
+
+  --color-pass: var(--pm-pass);
+  --color-fail: var(--pm-fail);
+  --color-warning: var(--pm-warning);
+  --color-info: var(--pm-info);
+  --color-bonus: var(--pm-bonus);
+  --color-skipped: var(--pm-skipped);
+
+  --color-sev-critical: var(--pm-sev-critical);
+  --color-sev-major: var(--pm-sev-major);
+  --color-sev-minor: var(--pm-sev-minor);
+  --color-sev-style: var(--pm-sev-style);
+
+  --color-code-bg: var(--pm-code-bg);
+  --color-terminal-bg: var(--pm-terminal-bg);
+  --color-terminal-fg: var(--pm-terminal-fg);
+  /* Terminal panes are dark in both themes: these colors are theme-independent on purpose. */
+  --color-terminal-muted: #8b8b96;
+  --color-terminal-input: #ffd166;
+  --color-terminal-stderr: #ff8f9c;
+  --color-terminal-border: rgb(255 255 255 / 0.08);
+  --color-syn-keyword: var(--pm-syn-keyword);
+  --color-syn-string: var(--pm-syn-string);
+  --color-syn-number: var(--pm-syn-number);
+  --color-syn-comment: var(--pm-syn-comment);
+  --color-syn-function: var(--pm-syn-function);
+  --color-syn-builtin: var(--pm-syn-builtin);
+  --color-syn-decorator: var(--pm-syn-decorator);
+
+  --shadow-card: inset 0 1px 0 0 var(--pm-highlight), 0 1px 2px 0 var(--pm-shadow);
+  --shadow-pop: 0 0 0 1px var(--pm-border-strong), 0 16px 40px -12px var(--pm-shadow);
+  --shadow-button: inset 0 1px 0 0 rgb(255 255 255 / 0.16), 0 1px 2px 0 rgb(0 0 0 / 0.3);
+}
+
+@theme {
+  --font-sans: 'Inter Variable', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --font-mono: 'JetBrains Mono Variable', ui-monospace, 'Cascadia Code', Consolas, monospace;
+
+  --text-2xs: 0.6875rem;
+  --text-2xs--line-height: 1rem;
+
+  --ease-out-quart: cubic-bezier(0.25, 1, 0.5, 1);
+  --ease-in-out-soft: cubic-bezier(0.65, 0, 0.35, 1);
+
+  --animate-fade-in: fade-in 160ms var(--ease-out-quart);
+  --animate-fade-out: fade-out 120ms ease-in;
+  --animate-pop-in: pop-in 180ms var(--ease-out-quart);
+  --animate-pop-out: pop-out 120ms ease-in;
+  --animate-sheet-in: sheet-in 240ms var(--ease-out-quart);
+  --animate-sheet-out: sheet-out 180ms ease-in;
+  --animate-shimmer: shimmer 1.6s linear infinite;
+  --animate-spin-slow: spin 2.4s linear infinite;
+
+  @keyframes fade-in {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+  @keyframes fade-out {
+    from { opacity: 1; }
+    to { opacity: 0; }
+  }
+  @keyframes pop-in {
+    from { opacity: 0; transform: translateY(4px) scale(0.98); }
+    to { opacity: 1; transform: translateY(0) scale(1); }
+  }
+  @keyframes pop-out {
+    from { opacity: 1; transform: scale(1); }
+    to { opacity: 0; transform: scale(0.98); }
+  }
+  @keyframes sheet-in {
+    from { transform: translateX(100%); }
+    to { transform: translateX(0); }
+  }
+  @keyframes sheet-out {
+    from { transform: translateX(0); }
+    to { transform: translateX(100%); }
+  }
+  @keyframes shimmer {
+    from { background-position: 200% 0; }
+    to { background-position: -200% 0; }
+  }
+}
+
+@layer base {
+  html {
+    -webkit-text-size-adjust: 100%;
+  }
+  body {
+    @apply bg-bg font-sans text-fg antialiased;
+    font-feature-settings: 'cv02', 'cv03', 'cv04', 'cv11';
+    min-height: 100dvh;
+  }
+  h1,
+  h2,
+  h3,
+  h4 {
+    letter-spacing: -0.02em;
+    text-wrap: balance;
+  }
+  code,
+  kbd,
+  pre,
+  samp {
+    font-family: var(--font-mono);
+    font-feature-settings: 'calt' 0;
+  }
+  ::selection {
+    background: color-mix(in oklab, var(--pm-accent) 38%, transparent);
+  }
+  :focus-visible {
+    outline: 2px solid var(--pm-ring);
+    outline-offset: 2px;
+    border-radius: 4px;
+  }
+  button:not(:disabled),
+  [role='button']:not([aria-disabled='true']),
+  summary {
+    cursor: pointer;
+  }
+  * {
+    scrollbar-width: thin;
+    scrollbar-color: var(--pm-border-strong) transparent;
+  }
+}
+
+@utility tabular {
+  font-variant-numeric: tabular-nums;
+}
+
+@utility surface-glow {
+  background-image: radial-gradient(
+    60rem 22rem at 50% -6rem,
+    color-mix(in oklab, var(--pm-accent) 13%, transparent),
+    transparent 70%
+  );
+}
+
+@utility bg-dots {
+  background-image: radial-gradient(color-mix(in oklab, var(--pm-fg) 9%, transparent) 1px, transparent 1px);
+  background-size: 22px 22px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  ::before,
+  ::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+  /* Small activity spinners are essential feedback: keep them, slowed down. */
+  .animate-spin {
+    animation-duration: 1.4s !important;
+    animation-iteration-count: infinite !important;
+  }
+}
+
+/* Search inputs render their own clear button: hide the native one (WebKit/Blink). */
+input[type='search']::-webkit-search-cancel-button,
+input[type='search']::-webkit-search-decoration {
+  -webkit-appearance: none;
+  appearance: none;
+}
+
