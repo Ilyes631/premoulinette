@@ -1,0 +1,3 @@
+# Windows scripts need CRLF, POSIX scripts need LF, whatever the contributor's git settings.
+*.bat text eol=crlf
+*.sh  text eol=lf

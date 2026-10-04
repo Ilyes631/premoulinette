@@ -2,6 +2,9 @@
 
 **Test your project before the real submission.**
 
+> 🇫🇷 **Pas à l'aise avec l'informatique ? Suis le [guide débutant en français](GUIDE.md)** : installation
+> pas à pas, puis comment vérifier ton TP. Sur Windows : télécharge le projet et double-clique sur `start.bat`.
+
 PréMoulinette is a local pre-grader for programming assignments (TPs). You give it the assignment
 subject and your project. It works out what the subject requires, runs deterministic checks and
 sandboxed tests on your code, and shows a **Readiness Score** with precise, clickable diagnostics.
