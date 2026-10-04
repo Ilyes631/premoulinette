@@ -4,6 +4,7 @@
  * so tests can stub endpoints with `vi.spyOn(api, ...)`.
  */
 import { QueryClient, useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import { useCallback } from 'react'
 import { api, ApiError, type ListAnalysesParams } from './api'
 import type {
   DemoVariant,
@@ -29,6 +30,7 @@ export const queryKeys = {
   subjectDocument: (id: string) => ['subjects', id, 'document'] as const,
   specSchema: ['spec-schema'] as const,
   projects: ['projects'] as const,
+  discoveredProjects: ['discovered-projects'] as const,
   project: (id: string) => ['projects', id] as const,
   projectFile: (id: string, path: string) => ['projects', id, 'file', path] as const,
   job: (id: string) => ['jobs', id] as const,
@@ -178,6 +180,36 @@ export function useCreateProject() {
 
 export function useProjects() {
   return useQuery({ queryKey: queryKeys.projects, queryFn: () => api.listProjects() })
+}
+
+const DISCOVER_STALE_MS = 60_000
+
+/** Git repositories found on this PC (GET /api/projects/discover), cached for a minute. */
+export function useDiscoverProjects() {
+  return useQuery({
+    queryKey: queryKeys.discoveredProjects,
+    queryFn: ({ signal }) => api.discoverProjects(false, signal),
+    staleTime: DISCOVER_STALE_MS,
+  })
+}
+
+/** Scans the PC again (`?refresh=1`, bypassing the server cache) into the discover query. */
+export function useRefreshDiscoveredProjects() {
+  const qc = useQueryClient()
+  return useCallback(
+    () =>
+      qc
+        .fetchQuery({
+          queryKey: queryKeys.discoveredProjects,
+          queryFn: ({ signal }) => api.discoverProjects(true, signal),
+          staleTime: 0,
+        })
+        .then(
+          () => undefined,
+          () => undefined, // reported by the query's error state
+        ),
+    [qc],
+  )
 }
 
 export function useProject(id: string | null | undefined) {

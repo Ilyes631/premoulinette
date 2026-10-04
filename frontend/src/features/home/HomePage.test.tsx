@@ -5,6 +5,7 @@ import { analyzeBlocker, looksAbsolute, normalizePathInput } from '@/features/ho
 import { SELECTED_PROJECT_KEY, SELECTED_SUBJECT_KEY } from '@/features/home/selection'
 import { recallJob } from '@/features/progress/job-context'
 import { api, ApiError } from '@/lib/api'
+import type { DiscoveredProject, DiscoverProjectsResult } from '@/lib/types'
 import { HomePage } from '@/pages/HomePage'
 import { makeHealth, makeProjectView, makeSubjectView, renderRoute } from './test-utils'
 
@@ -14,10 +15,33 @@ function analyzeButton() {
 const subjectCard = () => screen.getByRole('region', { name: 'Subject' })
 const projectCard = () => screen.getByRole('region', { name: 'Student project' })
 
+const noDiscovered: DiscoverProjectsResult = { projects: [], scanned: [], duration_ms: 1 }
+
+function makeDiscovered(overrides: Partial<DiscoveredProject> = {}): DiscoveredProject {
+  return {
+    path: '\\\\wsl.localhost\\Ubuntu\\root\\epita-prog-101-tp2',
+    name: 'epita-prog-101-tp2',
+    location: 'wsl',
+    distro: 'Ubuntu',
+    display_path: 'Ubuntu: /root/epita-prog-101-tp2',
+    branch: 'main',
+    last_activity: new Date(Date.now() - 2 * 3600_000).toISOString(),
+    last_message: 'commit: TP2',
+    remote_url: 'git@git.forge.epita.fr:p/tp2.git',
+    is_school: true,
+    ...overrides,
+  }
+}
+
+async function openLocalFolderTab(user: ReturnType<typeof userEvent.setup>) {
+  await user.click(within(projectCard()).getByRole('tab', { name: /local folder/i }))
+}
+
 describe('HomePage', () => {
   beforeEach(() => {
     vi.spyOn(api, 'getHealth').mockResolvedValue(makeHealth())
     vi.spyOn(api, 'listAnalyses').mockResolvedValue([])
+    vi.spyOn(api, 'discoverProjects').mockResolvedValue(noDiscovered)
   })
 
   it('renders the hero and keeps Analyze disabled until both imports are ready', async () => {
@@ -44,6 +68,7 @@ describe('HomePage', () => {
     expect(screen.getByText('Import your student project to start.')).toBeInTheDocument()
 
     // 2. project from a local folder (quotes from "Copy as path" are stripped)
+    await openLocalFolderTab(user)
     await user.type(screen.getByLabelText('Absolute path of your project folder'), '"C:\\Users\\me\\tp1"')
     await user.click(screen.getByRole('button', { name: 'Use folder' }))
     expect(createFromPath).toHaveBeenCalledWith('C:\\Users\\me\\tp1')
@@ -76,6 +101,7 @@ describe('HomePage', () => {
     await user.upload(screen.getByLabelText('Subject file'), new File(['x'], 'notes.docx'))
     expect(await screen.findByText(/is not a supported subject/)).toBeInTheDocument()
 
+    await openLocalFolderTab(user)
     await user.type(screen.getByLabelText('Absolute path of your project folder'), 'tp1')
     await user.click(screen.getByRole('button', { name: 'Use folder' }))
     expect(await screen.findByText(/is not an absolute path/)).toBeInTheDocument()
@@ -174,6 +200,107 @@ describe('HomePage', () => {
     expect(within(row).getByText('#3')).toBeInTheDocument()
     expect(within(row).getByText('62%')).toBeInTheDocument()
     expect(within(row).getByText('Not ready')).toBeInTheDocument()
+  })
+})
+
+describe('My projects tab', () => {
+  beforeEach(() => {
+    vi.spyOn(api, 'getHealth').mockResolvedValue(makeHealth())
+    vi.spyOn(api, 'listAnalyses').mockResolvedValue([])
+  })
+
+  it('lists the projects found on the PC with their badges', async () => {
+    vi.spyOn(api, 'discoverProjects').mockResolvedValue({
+      projects: [
+        makeDiscovered(),
+        makeDiscovered({
+          path: 'C:\\Users\\me\\Documents\\perso',
+          name: 'perso',
+          location: 'windows',
+          distro: null,
+          display_path: 'C:\\Users\\me\\Documents\\perso',
+          branch: 'dev',
+          last_activity: null,
+          is_school: false,
+        }),
+      ],
+      scanned: ['Ubuntu: /root', 'C:\\Users\\me'],
+      duration_ms: 42,
+    })
+    renderRoute(<HomePage />)
+
+    expect(within(projectCard()).getByRole('tab', { name: /my projects/i })).toHaveAttribute('aria-selected', 'true')
+    const list = await screen.findByRole('list', { name: 'Projects found on this PC' })
+    const rows = within(list).getAllByRole('button')
+    expect(rows).toHaveLength(2)
+
+    const school = rows[0] as HTMLElement
+    expect(within(school).getByText('epita-prog-101-tp2')).toBeInTheDocument()
+    expect(within(school).getByText('Ubuntu')).toBeInTheDocument()
+    expect(within(school).getByText('School')).toBeInTheDocument()
+    expect(within(school).getByText('main')).toBeInTheDocument()
+    expect(within(school).getByText('last change 2 hours ago')).toBeInTheDocument()
+    expect(within(school).getByText('Ubuntu: /root/epita-prog-101-tp2')).toBeInTheDocument()
+
+    const perso = rows[1] as HTMLElement
+    expect(within(perso).getByText('Windows')).toBeInTheDocument()
+    expect(within(perso).queryByText('School')).not.toBeInTheDocument()
+    expect(within(perso).queryByText(/last change/)).not.toBeInTheDocument()
+  })
+
+  it('imports a project with one click, like the Local folder flow', async () => {
+    const user = userEvent.setup()
+    const found = makeDiscovered()
+    vi.spyOn(api, 'discoverProjects').mockResolvedValue({ projects: [found], scanned: [], duration_ms: 1 })
+    const createFromPath = vi
+      .spyOn(api, 'createProjectFromPath')
+      .mockResolvedValue(makeProjectView({ name: 'epita-prog-101-tp2', source_path: found.path }))
+    renderRoute(<HomePage />)
+
+    await user.click(await screen.findByRole('button', { name: /epita-prog-101-tp2/ }))
+    expect(createFromPath).toHaveBeenCalledWith(found.path)
+    expect(await within(projectCard()).findByText('Snapshot ready')).toBeInTheDocument()
+    expect(window.localStorage.getItem(SELECTED_PROJECT_KEY)).toBe('proj-1')
+  })
+
+  it('shows the first 6 projects and a Show all toggle', async () => {
+    const user = userEvent.setup()
+    const projects = Array.from({ length: 8 }, (_, i) =>
+      makeDiscovered({ path: `C:\\tp${i}`, name: `tp${i}`, location: 'windows', distro: null }),
+    )
+    vi.spyOn(api, 'discoverProjects').mockResolvedValue({ projects, scanned: [], duration_ms: 1 })
+    renderRoute(<HomePage />)
+
+    const list = await screen.findByRole('list', { name: 'Projects found on this PC' })
+    expect(within(list).getAllByRole('button')).toHaveLength(6)
+    await user.click(screen.getByRole('button', { name: 'Show all (2 more)' }))
+    expect(within(list).getAllByRole('button')).toHaveLength(8)
+  })
+
+  it('switches to the Local folder tab when nothing is found', async () => {
+    const user = userEvent.setup()
+    vi.spyOn(api, 'discoverProjects').mockResolvedValue(noDiscovered)
+    renderRoute(<HomePage />)
+
+    expect(await screen.findByText('No project found automatically.')).toBeInTheDocument()
+    expect(screen.getByText('wslpath -w .')).toBeInTheDocument()
+    await user.click(screen.getByRole('button', { name: 'Use the Local folder tab' }))
+    expect(within(projectCard()).getByRole('tab', { name: /local folder/i })).toHaveAttribute('aria-selected', 'true')
+    expect(screen.getByLabelText('Absolute path of your project folder')).toBeInTheDocument()
+  })
+
+  it('reports a failed search and retries with refresh=1', async () => {
+    const user = userEvent.setup()
+    const discover = vi
+      .spyOn(api, 'discoverProjects')
+      .mockRejectedValueOnce(new ApiError(500, 'Scan failed'))
+      .mockResolvedValue({ projects: [makeDiscovered()], scanned: [], duration_ms: 1 })
+    renderRoute(<HomePage />)
+
+    expect(await screen.findByText('Could not look for your projects.')).toBeInTheDocument()
+    await user.click(screen.getByRole('button', { name: 'Try again' }))
+    expect(await screen.findByRole('button', { name: /epita-prog-101-tp2/ })).toBeInTheDocument()
+    expect(discover).toHaveBeenLastCalledWith(true, expect.anything())
   })
 })
 

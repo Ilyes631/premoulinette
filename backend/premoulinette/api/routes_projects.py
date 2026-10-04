@@ -1,6 +1,7 @@
 """Project endpoints: import (zip / folder upload / local path), view, read-only file viewer."""
 from __future__ import annotations
 
+import os
 import re
 import uuid
 import zipfile
@@ -16,11 +17,17 @@ from starlette.datastructures import UploadFile
 from premoulinette.api.context import AppContext, get_ctx
 from premoulinette.api.uploads import check_content_length, read_limited, safe_filename, too_large
 from premoulinette.api.views import ProjectListItem, ProjectView, project_list_item, project_view
-from premoulinette.config import FILE_VIEW_MAX_BYTES, FOLDER_UPLOAD_MAX_BYTES, FOLDER_UPLOAD_MAX_FILES, ZIP_MAX_BYTES
+from premoulinette.config import (
+    FILE_VIEW_MAX_BYTES, FOLDER_UPLOAD_MAX_BYTES, FOLDER_UPLOAD_MAX_FILES, REPO_ROOT, ZIP_MAX_BYTES,
+)
 from premoulinette.engine.snapshots import count_python_files, new_snapshot_dir, remove_tree
+from premoulinette.project import discover
 from premoulinette.store.db import ProjectRecord
 
 router = APIRouter()
+
+# On Windows a path starting with "/" is a Linux path copied from WSL (``pwd``): it is looked up in WSL.
+_ACCEPT_LINUX_PATHS = os.name == "nt"
 
 # Errors raised by project ingestion that describe a bad input (-> 400), not a server bug.
 _INGEST_ERRORS = (ValueError, zipfile.BadZipFile, PermissionError, FileNotFoundError, NotADirectoryError)
@@ -93,8 +100,21 @@ def _upload_name(entries: list[tuple[str, bytes]]) -> str:
     return "uploaded-project"
 
 
+def _wsl_folder(raw: str) -> Path:
+    """A Linux path (``/root/tp`` as printed by ``pwd`` in WSL) -> its ``\\\\wsl.localhost\\<distro>\\…`` folder."""
+    distros = discover.list_wsl_distros()
+    converted = discover.linux_path_to_wsl(raw, distros)
+    if converted is None:
+        where = ", ".join(distros) or "no WSL distribution installed"
+        raise HTTPException(status_code=400, detail=f"Folder not found in Windows nor in WSL ({where}): {raw}")
+    return Path(converted)
+
+
 def _validate_local_folder(ctx: AppContext, raw: str) -> Path:
-    path = Path(raw).expanduser()
+    if _ACCEPT_LINUX_PATHS and raw.startswith("/") and not raw.startswith("//"):
+        path = _wsl_folder(raw)
+    else:
+        path = Path(raw).expanduser()
     if not path.is_absolute():
         raise HTTPException(status_code=400, detail="Give the absolute path of the project folder.")
     try:
@@ -139,6 +159,15 @@ def _create(
 @router.get("/projects", response_model=list[ProjectListItem])
 def list_projects(ctx: AppContext = Depends(get_ctx)) -> list[ProjectListItem]:
     return [project_list_item(r) for r in ctx.store.list_projects()]
+
+
+@router.get("/projects/discover")
+def discover_local_projects(refresh: bool = False, ctx: AppContext = Depends(get_ctx)) -> dict[str, Any]:
+    """Git repositories found on this computer (Windows folders, WSL homes…), to pick one with a click.
+
+    Declared before ``/projects/{project_id}``. Nothing is executed inside the repositories.
+    """
+    return discover.discover_projects(refresh=refresh, exclude=[REPO_ROOT, ctx.paths.root])
 
 
 @router.get("/projects/{project_id}", response_model=ProjectView)

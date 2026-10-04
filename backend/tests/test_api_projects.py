@@ -1,12 +1,21 @@
 from __future__ import annotations
 
 import io
+import os
 import zipfile
 from pathlib import Path
 
 import pytest
 
 from test_api_fakes import harness_factory, make_project_dir  # noqa: F401  (fixture)
+
+
+@pytest.fixture(autouse=True)
+def no_real_wsl(monkeypatch: pytest.MonkeyPatch) -> None:
+    """Linux paths ("/root/…") are looked up in WSL on Windows: never touch the real WSL in tests."""
+    from premoulinette.project import discover
+
+    monkeypatch.setattr(discover, "list_wsl_distros", lambda: [])
 
 
 @pytest.fixture
@@ -68,6 +77,44 @@ def test_invalid_local_paths(harness_factory, bad: str) -> None:
     r = create_from_path(h, bad)
     assert r.status_code == 400
     assert h.store.list_projects() == []
+
+
+def _fake_wsl(monkeypatch: pytest.MonkeyPatch, wsl_root: Path, distros: list[str]) -> None:
+    import premoulinette.api.routes_projects as routes
+    from premoulinette.project import discover
+
+    monkeypatch.setattr(routes, "_ACCEPT_LINUX_PATHS", True)
+    monkeypatch.setattr(discover, "UNC_PREFIXES", (str(wsl_root) + os.sep,))
+    monkeypatch.setattr(discover, "list_wsl_distros", lambda: list(distros))
+
+
+def test_linux_path_is_found_in_wsl(harness_factory, tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+    wsl_root = tmp_path / "wsl"
+    make_project_dir(wsl_root / "Debian" / "root" / "epita-tp")
+    (wsl_root / "Ubuntu" / "root").mkdir(parents=True)
+    _fake_wsl(monkeypatch, wsl_root, ["Ubuntu", "Debian"])
+    h = harness_factory()
+    r = create_from_path(h, "/root/epita-tp")
+    assert r.status_code == 200, r.text
+    assert r.json()["name"] == "epita-tp"
+    assert r.json()["source_path"] == str((wsl_root / "Debian" / "root" / "epita-tp").resolve())
+
+
+def test_linux_path_not_found_in_wsl(harness_factory, tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+    _fake_wsl(monkeypatch, tmp_path / "wsl", ["Ubuntu", "Debian"])
+    h = harness_factory()
+    r = create_from_path(h, "/root/missing")
+    assert r.status_code == 400
+    assert r.json()["detail"] == "Folder not found in Windows nor in WSL (Ubuntu, Debian): /root/missing"
+
+
+def test_linux_path_cannot_reach_the_data_dir(harness_factory, tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+    h = harness_factory()
+    # the fake WSL "distro" is the parent of the data dir: "/data" maps onto it
+    _fake_wsl(monkeypatch, tmp_path.parent, [tmp_path.name])
+    r = create_from_path(h, "/data")
+    assert r.status_code == 400
+    assert "data directory" in r.json()["detail"]
 
 
 def test_file_instead_of_folder(harness_factory, project_dir: Path) -> None:

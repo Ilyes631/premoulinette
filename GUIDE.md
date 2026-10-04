@@ -107,22 +107,25 @@ Tu vois cette page, avec **deux grandes cases** :
 3. La case affiche le nom du TP et un ✓ vert. C'est bon.
 
 ### Étape 4 : donner ton travail à PréMoulinette
-Il faut dire à PréMoulinette **où est le dossier de ton TP**. Voici où cliquer (A = le sujet de l'étape 3,
-puis **1 → 2 → 3** pour ton travail, puis **4** pour lancer) :
+**C'est automatique : tu n'as rien à chercher.**
 
-![Où cliquer](docs/screenshots/guide-etapes.png)
+1. Regarde la **case de droite** (« Student project »). L'onglet **« My projects »** est déjà ouvert.
+2. PréMoulinette a cherché tout seul les TP présents sur ton ordinateur, dans Windows et dans Ubuntu.
+   Ton TP d'école est **en haut de la liste**, avec une étiquette **« School »**.
+3. **Clique dessus.** C'est tout.
+   La case affiche le nom de ton TP et **« Ready »** en vert.
 
-1. Ouvre le dossier de ton TP, comme quand tu cherches un fichier.
-2. Clique **une fois** dans la **barre d'adresse**, tout en haut de la fenêtre du dossier.
-   Elle devient bleue et affiche l'adresse du dossier, par exemple `C:\Users\Lea\Documents\mon-tp`.
-3. Appuie sur **Ctrl** + **C** pour copier cette adresse.
-4. Dans PréMoulinette, dans la **case de droite** (« Student project »), clique dans le champ de texte.
-5. Appuie sur **Ctrl** + **V** pour coller, puis clique sur **« Use folder »**.
+PréMoulinette s'en souvient : la prochaine fois, ton TP sera déjà sélectionné.
 
-> **Ton TP est dans Ubuntu ?** Dans la fenêtre Ubuntu, va dans le dossier de ton TP, puis tape
-> `explorer.exe .` (n'oublie pas le point) et appuie sur Entrée. Une fenêtre de dossier normale s'ouvre :
-> fais ensuite les points 2 à 5 ci-dessus.
+<details>
+<summary>Ton TP n'est pas dans la liste ? (cas rare)</summary>
 
+1. Clique sur l'onglet **« Local folder »** dans la même case.
+2. Colle l'adresse du dossier de ton TP dans la case blanche, puis clique **« Use folder »**.
+   - TP sur Windows : ouvre le dossier, clique dans la barre d'adresse en haut, puis **Ctrl + C**.
+   - TP dans Ubuntu : dans ton dossier de TP, tape `pwd` et copie ce qui s'affiche (par exemple `/root/mon-tp`).
+     PréMoulinette comprend ce format directement.
+</details>
 ### Étape 5 : lancer la vérification
 1. Clique sur le gros bouton **« Analyze project »**, en bas.
 2. Attends environ 30 secondes. Tu vois les étapes se cocher une par une.

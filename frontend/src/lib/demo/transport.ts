@@ -8,6 +8,7 @@
  *   project is its Analysis #1, any later one its Analysis #2 (the "fixed" run); analyses only
  *   appear in lists once they were run (or opened by a link), with "now" as their date.
  * - POST .../explain: the recorded template explanation (other language as a fallback).
+ * - GET /api/projects/discover: one sample entry (`discover.ts`); picking it is refused below.
  * - Everything else (uploads, local folders, saving settings or the contract, AI, Docker)
  *   rejects with a {@link DemoReadOnlyError}.
  *
@@ -26,6 +27,7 @@ import type {
   Settings,
   StartAnalysisRequest,
 } from '../types'
+import { demoDiscoveredProjects } from './discover'
 import { DemoReadOnlyError } from './errors'
 import { DEMO_JOB_DURATION_MS, simulateJob, type SimulatedJob } from './job-sim'
 import {
@@ -304,6 +306,7 @@ export function createDemoTransport(options: DemoTransportOptions): DemoTranspor
     if ((method !== 'GET' && !(method === 'POST' && servedPost)) || path.endsWith('/ai-payload')) {
       throw new DemoReadOnlyError(readOnlyAction(method, path, req.form))
     }
+    if (method === 'GET' && path === '/api/projects/discover') return demoDiscoveredProjects(now())
     const m = await manifest()
     if (method === 'GET') {
       if (path === '/api/analyses') return listAnalyses(m, req.query)

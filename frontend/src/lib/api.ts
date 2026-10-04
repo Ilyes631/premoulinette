@@ -16,6 +16,7 @@ import type {
   AnalysisReport,
   DemoLoadResult,
   DemoVariant,
+  DiscoverProjectsResult,
   ExplainMode,
   ExplainRequest,
   Explanation,
@@ -185,6 +186,9 @@ export function createProjectFromFolder(files: File[], name?: string): Promise<P
   return apiRequest<ProjectView>('/projects', { method: 'POST', form })
 }
 export const listProjects = () => apiRequest<ProjectListItem[]>('/projects')
+/** Git repositories found on this PC (Windows + WSL). `refresh` bypasses the server cache. */
+export const discoverProjects = (refresh = false, signal?: AbortSignal) =>
+  apiRequest<DiscoverProjectsResult>('/projects/discover', { query: { refresh: refresh ? 1 : 0 }, signal })
 export const getProject = (id: string) => apiRequest<ProjectView>(`/projects/${enc(id)}`)
 export const getProjectFile = (id: string, path: string) =>
   apiRequest<ProjectFile>(`/projects/${enc(id)}/file`, { query: { path } })
@@ -248,6 +252,7 @@ export const api = {
   createProjectFromZip,
   createProjectFromFolder,
   listProjects,
+  discoverProjects,
   getProject,
   getProjectFile,
   startAnalysis,

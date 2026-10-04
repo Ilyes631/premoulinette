@@ -2,6 +2,7 @@ import {
   FileArchive,
   FileCode2,
   Files,
+  FolderGit2,
   FolderOpen,
   FolderTree,
   FolderUp,
@@ -15,14 +16,15 @@ import { DemoReadOnlyNotice } from '@/components/demo/read-only-notice'
 import { Badge, Button, Input, Skeleton, Tabs, TabsContent, TabsList, TabsTrigger, Tooltip } from '@/components/ui'
 import { errorMessage, isApiError, isDemoReadOnlyError } from '@/lib/api'
 import { useCreateProject, useProject, type ProjectSource } from '@/lib/queries'
-import type { ProjectSourceKindView, ProjectView } from '@/lib/types'
+import type { DiscoveredProject, ProjectSourceKindView, ProjectView } from '@/lib/types'
 import { isZipFile, prepareFolderFiles, ZIP_ACCEPT } from '@/lib/uploads'
+import { DiscoverList } from './discover-list'
 import { DropArea } from './drop-area'
 import { ImportCard, ImportError, type ImportState } from './import-card'
 import { looksAbsolute, normalizePathInput } from './logic'
 import { BusyContent, MiniStat } from './subject-card'
 
-type SourceTab = 'path' | 'zip' | 'folder'
+type SourceTab = 'mine' | 'path' | 'zip' | 'folder'
 
 const SOURCE_LABEL: Record<ProjectSourceKindView, string> = {
   path: 'Local folder',
@@ -41,7 +43,7 @@ export interface ProjectCardProps {
 export function ProjectCard({ projectId, onSelect, externalBusy = false, onStateChange }: ProjectCardProps) {
   const project = useProject(projectId)
   const create = useCreateProject()
-  const [tab, setTab] = useState<SourceTab>('path')
+  const [tab, setTab] = useState<SourceTab>('mine')
   const [replacing, setReplacing] = useState(false)
   const [localError, setLocalError] = useState<string | null>(null)
   const [busyLabel, setBusyLabel] = useState<string | null>(null)
@@ -87,6 +89,8 @@ export function ProjectCard({ projectId, onSelect, externalBusy = false, onState
   }
 
   const onPath = (path: string) => submit({ kind: 'path', path }, 'Copying your folder…')
+  const onDiscovered = (found: DiscoveredProject) =>
+    submit({ kind: 'path', path: found.path }, `Copying ${found.name}…`)
 
   const uploading = create.isPending || externalBusy
   const data = project.data && project.data.id === projectId ? project.data : undefined
@@ -140,20 +144,24 @@ export function ProjectCard({ projectId, onSelect, externalBusy = false, onState
         </div>
       ) : (
         <Tabs value={tab} onValueChange={(v) => setTab(v as SourceTab)} className="flex flex-col gap-3">
-          <div className="flex items-center justify-between gap-2">
+          <div className="@container flex items-center justify-between gap-2">
             <TabsList aria-label="Project source" className="max-w-full overflow-x-auto">
+              <TabsTrigger value="mine">
+                <FolderGit2 aria-hidden />
+                My projects
+              </TabsTrigger>
               <TabsTrigger value="path">
                 <HardDrive aria-hidden />
                 Local folder
               </TabsTrigger>
-              <TabsTrigger value="zip">
+              {/* Narrow cards: ZIP and Upload shrink to their icon (the name stays for screen readers). */}
+              <TabsTrigger value="zip" title="ZIP archive">
                 <FileArchive aria-hidden />
-                ZIP
+                <span className="sr-only @[27rem]:not-sr-only">ZIP</span>
               </TabsTrigger>
-              <TabsTrigger value="folder">
+              <TabsTrigger value="folder" title="Folder upload">
                 <FolderUp aria-hidden />
-                <span className="hidden min-[420px]:inline">Folder upload</span>
-                <span className="min-[420px]:hidden">Upload</span>
+                <span className="sr-only @[27rem]:not-sr-only">Upload</span>
               </TabsTrigger>
             </TabsList>
             {replacing && data && (
@@ -165,6 +173,9 @@ export function ProjectCard({ projectId, onSelect, externalBusy = false, onState
             )}
           </div>
 
+          <TabsContent value="mine">
+            <DiscoverList onPick={onDiscovered} onUseLocalFolder={() => setTab('path')} />
+          </TabsContent>
           <TabsContent value="path">
             <PathForm onSubmit={onPath} onInvalid={setLocalError} />
           </TabsContent>
@@ -232,7 +243,7 @@ function PathForm({ onSubmit, onInvalid }: { onSubmit: (path: string) => void; o
     }
     if (!looksAbsolute(path)) {
       setInvalid(true)
-      onInvalid(`"${path}" is not an absolute path (e.g. C:\\Users\\me\\tp1 or /home/me/tp1).`)
+      onInvalid(`"${path}" is not an absolute path (e.g. C:\\Users\\you\\tp or /root/my-tp).`)
       return
     }
     setInvalid(false)
@@ -254,7 +265,7 @@ function PathForm({ onSubmit, onInvalid }: { onSubmit: (path: string) => void; o
             setValue(e.target.value)
             if (invalid) setInvalid(false)
           }}
-          placeholder="C:\Users\me\epita\tp1"
+          placeholder="C:\Users\you\tp  or  /root/my-tp"
           spellCheck={false}
           autoComplete="off"
           aria-describedby={helpId}
@@ -266,8 +277,9 @@ function PathForm({ onSubmit, onInvalid }: { onSubmit: (path: string) => void; o
         </Button>
       </div>
       <p id={helpId} className="text-xs text-fg-subtle">
-        <span className="font-medium text-pass">Recommended</span> — re-analysis re-reads your folder after you fix
-        code. Nothing in it is ever modified.
+        A Windows path like <span className="font-mono text-fg-muted">C:\Users\you\tp</span>, or the Ubuntu path printed
+        by <span className="font-mono text-fg-muted">pwd</span> like{' '}
+        <span className="font-mono text-fg-muted">/root/my-tp</span>. Nothing in the folder is ever modified.
       </p>
     </form>
   )

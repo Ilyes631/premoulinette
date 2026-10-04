@@ -152,6 +152,35 @@ export interface ProjectFile {
   size?: number
 }
 
+export type DiscoveredProjectLocation = 'wsl' | 'windows' | 'posix'
+
+/** One git repository found on the PC by GET /api/projects/discover. */
+export interface DiscoveredProject {
+  /** Absolute path accepted as-is by POST /api/projects (form field "path"). */
+  path: string
+  name: string
+  location: DiscoveredProjectLocation
+  /** WSL distro name (e.g. "Ubuntu"), null outside WSL. */
+  distro: string | null
+  /** Human path: "Ubuntu: /root/tp" or "C:\Users\me\tp". */
+  display_path: string
+  branch: string | null
+  /** ISO 8601 UTC of the last commit/checkout. */
+  last_activity: string | null
+  last_message: string | null
+  /** origin URL, credentials stripped. */
+  remote_url: string | null
+  is_school: boolean
+}
+
+export interface DiscoverProjectsResult {
+  /** Sorted: school projects first, then most recent activity. Max 50. */
+  projects: DiscoveredProject[]
+  /** Human labels of the scanned roots. */
+  scanned: string[]
+  duration_ms: number
+}
+
 export interface DemoLoadResult {
   subject: SubjectView
   project: ProjectView
