@@ -4,7 +4,7 @@ import type { Settings, SettingsUpdate } from '@/lib/types'
 export type SettingsDraft = Omit<Settings, 'has_api_key' | 'api_key_source'>
 
 /** Suggestions for the model field (free text: any valid model id is accepted). */
-export const MODEL_SUGGESTIONS = ['claude-sonnet-5-5', 'claude-opus-5-5', 'claude-haiku-4-5']
+export const MODEL_SUGGESTIONS = ['claude-opus-5-5', 'claude-sonnet-5-5', 'claude-haiku-4-5']
 
 export const TIMEOUT_MIN_S = 0.5
 export const TIMEOUT_MAX_S = 60

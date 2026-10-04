@@ -23,7 +23,7 @@ logger = logging.getLogger(__name__)
 Mode = Literal["explain", "fix"]
 Lang = Literal["fr", "en"]
 
-DEFAULT_MODEL = "claude-sonnet-5-5"
+DEFAULT_MODEL = "claude-opus-5-5"
 TIMEOUT_S = 30.0
 MAX_TOKENS = 4096                 # room for adaptive thinking + a ~200-word answer
 MAX_EXCERPT_LINES = 25

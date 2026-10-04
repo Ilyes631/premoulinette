@@ -112,7 +112,7 @@ def parse_heuristic(doc: SubjectDocument) -> ParseResult
 def ground_spec(spec: PracticalSpec, doc: SubjectDocument) -> PracticalSpec
     # any test/rule/file whose literal text can't be found in doc.text gets provenance "ai_extracted", confidence<=0.6
 # ai_parser.py   (Claude API, opt-in only; never called without consent)
-def parse_with_ai(doc: SubjectDocument, api_key: str, model: str = "claude-sonnet-5-5") -> ParseResult
+def parse_with_ai(doc: SubjectDocument, api_key: str, model: str = "claude-opus-5-5") -> ParseResult
 # pipeline.py
 def parse_subject(data: bytes, filename: str, *, use_ai: bool = False, api_key: str | None = None) -> tuple[SubjectDocument, ParseResult]
 ```
@@ -321,7 +321,7 @@ def how_to_fix(check: CheckResult, lang="fr") -> Explanation                    
 def expected_behavior(check: CheckResult, spec: PracticalSpec, lang="fr") -> Explanation   # what the subject requires (rule, examples, session)
 # ai.py   (opt-in, minimal payload, Anthropic Messages API)
 def build_payload(check: CheckResult, mode: Literal["explain","fix"], lang) -> dict   # ONLY: rule, relevant code excerpt (<= 25 lines), expected, actual, deterministic diagnosis
-def explain_with_ai(check, mode, lang, api_key, model="claude-sonnet-5-5") -> Explanation   # falls back to template on any error
+def explain_with_ai(check, mode, lang, api_key, model="claude-opus-5-5") -> Explanation   # falls back to template on any error
 ```
 
 ### `scoring/`, `report/`, `store/` — owner: REPORT agent
@@ -352,7 +352,7 @@ class SubjectRecord(BaseModel): id; title; source_name; created_at; updated_at; 
                                  media_type; parse_warnings: list[str]; parser: str; raw_path: str | None
 class ProjectRecord(BaseModel): id; name; source_kind; source_path: str | None; created_at; snapshot_path: str; file_count; python_files
 class Settings(BaseModel): sandbox_mode: Literal["auto","docker","local"]="auto"; local_mode_acknowledged: bool=False; docker_image="python:3.12-slim";
-    ai_enabled: bool=False; ai_model="claude-sonnet-5-5"; ai_consent_subject: bool=False; ai_consent_code: bool=False;
+    ai_enabled: bool=False; ai_model="claude-opus-5-5"; ai_consent_subject: bool=False; ai_consent_code: bool=False;
     anthropic_api_key: str | None=None (never returned by the API, only `has_api_key`); explanation_language: Literal["fr","en"]="fr"; default_timeout_s: float=5.0
 ```
 

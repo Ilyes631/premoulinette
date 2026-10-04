@@ -268,7 +268,7 @@ def test_settings_defaults_match_contract() -> None:
     s = Settings()
     assert (s.sandbox_mode, s.local_mode_acknowledged, s.docker_image) == ("auto", False, "python:3.12-slim")
     assert (s.ai_enabled, s.ai_model, s.ai_consent_subject, s.ai_consent_code) == (
-        False, "claude-sonnet-5-5", False, False)
+        False, "claude-opus-5-5", False, False)
     assert (s.anthropic_api_key, s.explanation_language, s.default_timeout_s) == (None, "fr", 5.0)
 
 

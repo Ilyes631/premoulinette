@@ -221,7 +221,7 @@ def test_unknown_mode_and_language_are_normalised():
 def test_contract_signature_and_defaults():
     params = inspect.signature(explain_with_ai).parameters
     assert list(params)[:5] == ["check", "mode", "lang", "api_key", "model"]
-    assert params["model"].default == "claude-sonnet-5-5"
+    assert params["model"].default == "claude-opus-5-5"
     assert ai.TIMEOUT_S == 30.0
 
 
@@ -248,7 +248,7 @@ def test_ai_explanation_with_a_fake_client():
     assert len(client.calls) == 1
     path, kwargs = client.calls[0]
     assert path == "beta.messages"                      # server-side refusal fallback beta
-    assert kwargs["model"] == "claude-sonnet-5-5"
+    assert kwargs["model"] == "claude-opus-5-5"
     assert kwargs["system"] == SYSTEM_PROMPT
     assert kwargs["timeout"] == 30.0
     assert kwargs["fallbacks"] == "default" and kwargs["betas"] == ["server-side-fallback-2026-07-01"]

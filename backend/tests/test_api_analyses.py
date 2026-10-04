@@ -208,7 +208,7 @@ def test_explain_ai_requires_opt_in(setup, monkeypatch: pytest.MonkeyPatch) -> N
     name, args, kwargs = spy.calls[-1]
     assert name == "ai"
     assert args[1:] == ("fix", "en", "sk-env-key")
-    assert kwargs == {"model": "claude-sonnet-5-5"}
+    assert kwargs == {"model": "claude-opus-5-5"}
 
 
 def test_ai_payload_preview(setup) -> None:

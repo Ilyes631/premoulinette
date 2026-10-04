@@ -61,7 +61,7 @@ class Settings(BaseModel):
     local_mode_acknowledged: bool = False
     docker_image: str = "python:3.12-slim"
     ai_enabled: bool = False
-    ai_model: str = "claude-sonnet-5-5"
+    ai_model: str = "claude-opus-5-5"
     ai_consent_subject: bool = False
     ai_consent_code: bool = False
     # Stored locally only; the API must never return it (expose `has_api_key` instead).

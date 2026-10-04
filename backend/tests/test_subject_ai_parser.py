@@ -51,7 +51,7 @@ def test_request_shape(doc):
     assert len(client.calls) == 1
     namespace, kw = client.calls[0]
     assert namespace == "beta"                      # server-side refusal fallback (beta)
-    assert kw["model"] == "claude-sonnet-5-5"
+    assert kw["model"] == "claude-opus-5-5"
     assert kw["fallbacks"] == "default" and kw["betas"] == ["server-side-fallback-2026-07-01"]
     assert kw["tool_choice"] == {"type": "auto"}    # forced tool choice is rejected by current models
     assert [t["name"] for t in kw["tools"]] == ["submit_spec"]
@@ -72,7 +72,7 @@ def test_other_model_uses_plain_messages(doc):
 def test_conversion(doc):
     result = parse_with_ai(doc, "sk-test", client=FakeClient(tool_response(demo_tool_input())))
     spec = result.spec
-    assert spec.metadata.parser == "ai:claude-sonnet-5-5"
+    assert spec.metadata.parser == "ai:claude-opus-5-5"
     assert spec.metadata.title == "TP 1 — MysteryInc: First Launch"
     assert [e.id for e in spec.exercises] == ["kelvin", "safe_speed", "access_code", "grade_landing"]
     kelvin = spec.exercise("kelvin").functions[0]

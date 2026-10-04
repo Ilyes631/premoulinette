@@ -42,9 +42,11 @@ from premoulinette.subject.transcript import command_script_and_argv
 
 log = logging.getLogger(__name__)
 
-DEFAULT_MODEL = "claude-sonnet-5-5"
+DEFAULT_MODEL = "claude-opus-5-5"
 TOOL_NAME = "submit_spec"
-MAX_TOKENS = 16000
+# Streamed request: room for adaptive thinking + a full spec of a long subject without truncation.
+MAX_TOKENS = 64000
+EFFORT = "high"                      # extraction must be complete; Opus 5.5 defaults to "medium"
 MAX_SUBJECT_CHARS = 300_000          # never truncate silently: refuse instead
 REQUEST_TIMEOUT_S = 180.0
 AI_CONFIDENCE = 0.7                  # before grounding (grounding caps ungrounded items at 0.6)
@@ -204,13 +206,21 @@ def _find_tool_input(response: Any) -> dict[str, Any] | None:
 
 
 def _request(client: Any, model: str, messages: list[dict[str, Any]]) -> Any:
+    """One streamed request (large ``max_tokens`` must stream to avoid HTTP timeouts); returns the final message.
+
+    The tool input is buffered (no ``eager_input_streaming``) so ``strict: true`` keeps it schema-valid.
+    """
     kwargs: dict[str, Any] = dict(
         model=model, max_tokens=MAX_TOKENS, system=SYSTEM_PROMPT, tools=[SUBMIT_TOOL],
         tool_choice={"type": "auto"}, messages=messages,
     )
     if model in _FALLBACK_MODELS:
-        return client.beta.messages.create(betas=[_FALLBACK_BETA], fallbacks="default", **kwargs)
-    return client.messages.create(**kwargs)
+        kwargs["output_config"] = {"effort": EFFORT}
+        stream = client.beta.messages.stream(betas=[_FALLBACK_BETA], fallbacks="default", **kwargs)
+    else:
+        stream = client.messages.stream(**kwargs)
+    with stream as s:
+        return s.get_final_message()
 
 
 def _call_model(client: Any, model: str, text: str) -> dict[str, Any]:

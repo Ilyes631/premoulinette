@@ -18,6 +18,25 @@ class _Messages:
             raise AssertionError("unexpected extra API call")
         return self.owner.responses.pop(0)
 
+    def stream(self, **kwargs: Any) -> "_Stream":
+        """Like the SDK's ``messages.stream(...)``: a context manager exposing ``get_final_message()``."""
+        return _Stream(lambda: self.create(**kwargs))
+
+
+class _Stream:
+    def __init__(self, fetch: Any) -> None:
+        self._fetch = fetch
+
+    def __enter__(self) -> "_Stream":
+        self._message = self._fetch()
+        return self
+
+    def __exit__(self, *exc: Any) -> None:
+        return None
+
+    def get_final_message(self) -> Any:
+        return self._message
+
 
 class _Beta:
     def __init__(self, owner: "FakeClient") -> None:

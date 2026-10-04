@@ -157,7 +157,7 @@ def test_pipeline_with_ai(doc):
     pdoc, result = parse_subject(DEMO.read_bytes(), DEMO.name, use_ai=True, api_key="sk-test", ai_client=client)
     assert pdoc.sha256 == doc.sha256
     assert len(client.calls) == 1
-    assert result.spec.metadata.parser == "heuristic+ai:claude-sonnet-5-5"
+    assert result.spec.metadata.parser == "heuristic+ai:claude-opus-5-5"
     assert len(result.spec.exercises) == 11
     assert any("not found verbatim" in w for w in result.warnings)
     assert result.stats["function_tests"] == parse_heuristic(doc).stats["function_tests"] + 1
