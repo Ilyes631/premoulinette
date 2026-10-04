@@ -223,3 +223,7 @@ The test fixtures under `backend/tests/fixtures/projects/` are deliberate varian
 - Teacher mode and custom test packs (shareable PracticalSpec files)
 - Analyzing `HEAD` instead of the working tree (exactly what would be submitted)
 - Collaboration and an optional cloud version
+
+## License
+
+[MIT](LICENSE) © 2026 Ilyes631
